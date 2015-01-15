@@ -1,11 +1,25 @@
 #include <iostream>
 #include "Scanner.h"
 using namespace std;
-
-int main(int argc, char const *argv[])
+int main()
 {
-        Scanner scanner;
-        while(scanner.lex());
-        return 0;
+  Scanner scanner;   // define a Scanner object
+  while(scanner.lex());
+  /*while (int token = scanner.lex()) // get all tokens
+    {
+      string const &text = scanner.matched();
+      switch (token)
+	{
+	case Scanner::IDENTIFIER:
+	  cout << "identifier: " << text << '\n';
+	  break;
+	case Scanner::NUMBER:
+	  cout << "number: " << text << '\n';
+	  break;
+	default:
+	  cout << "char. token: `" << text << "'\n";
+	}
+    }
+   */
+    return 0;
 }
-

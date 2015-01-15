@@ -6,4 +6,4 @@ lex.cc: lex.l
 	#sed -i '/int lex()/r enums' Scanner.h
 
 clean:
-	rm lex.cc Scannerbase.h Scanner.ih Scanner.h lex-analyser
+	rm -f lex.cc Scannerbase.h Scanner.ih Scanner.h lex-analyser
