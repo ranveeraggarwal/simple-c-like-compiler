@@ -1,0 +1,30 @@
+          
+                    Lab Assignment 1
+                    ----------------
+
+Submission Date: 20th January 2014, 11:59:59pm
+ 
+
+This is  the first  of four  assignments over which  you will  build a
+compiler. The source language is a  small subset of C. The grammar for
+the language is given in an accompanying document. For this assignment
+you will build a lexical analyser using the lexical analyser generator
+tool flexc++. Specifically:
+
+1. Study  the grammar.  From the grammar,  identify the tokens  of the
+language.
+
+2. Study the flexc++ manual. 
+
+3. Write a  flexc++ script in a file called  lex.l.  This will contain
+the regexps and the actions that will be used to specify the tokens of
+the language.
+
+3. Use flexc++ to generate the files Scanner.h, Scannerbase.h and lex.c.
+
+4.   Use  a sedscript  similar  to  the  one  supplied to  insert  the
+declaration of the tokens in Parser.h.
+
+5. Compile the files lex.c and main.c (modified suitably).   
+
+6. Run the resulting executable on example programs.
