@@ -1,21 +1,76 @@
-whitespaces 																[ \t\n]
-identifier 																	[[:alpha:]_][[:alpha:][:digit:]_]*
-type_specifier																void|int|float
-condition_specifier															if|else
-loop_specifier																for|while
-bool_specifier																true|false
-return_specifier															return
-keywords																	{type_specifier}|{condition_specifier}|{loop_specifier}|{return_specifier}|{bool_specifier}
-exponent-part 																[eE][+-][0-9]*|[eE][0-9]*
-fractional-part 															[0-9]*
-integer-part 																[0-9]*
-floating-point-constant 													{integer-part}.{fractional-part}({exponent-part}?)
-c-integer-constant 															[1-9][0-9]*|0[bB][01]*|0[0-7]*|0[xX][0-9a-fA-F]*
-character-constant 															\'.\'
-c-constant 																	{c-integer-constant}|{floating-point-constant}|{character-constant}
+/* keywords */
+
+void														void
+int															int
+float 														float
+return														return
+if 															if
+else														else
+while														while
+for 														for
+
+
+/* identifiers */
+identifiers													[a-zA-Z_][a-zA-Z0-9_]*
+
+/* contants */
+int_constant												[1-9][0-9]*|0[bB][01]*|0[0-7]*|0[xX][0-9a-fA-F]*
+
+// float contants
+integer_part												[0-9]*
+fractional_part												[0-9]*
+exponent_part												[eE][+-][0-9]*[eE][0-9]*
+float_constant												{integer_part}\.{fractional_part}{exponent_part}
+
+STRING_LITERAL												"([^"\\]|\\.)*"
+
+
+/* Operators */
+NOT_OP														!
+ASS_OP														=
+ADD_OP														\+
+SUB_OP														\-
+MUL_OP														\*
+DIV_OP														\/
+LT_OP														<
+GL_OP														>
+LE_OP														<=
+GE_OP														>=
+EQ_OP														==
+NE_OP														!=
+AND_OP														&&
+OR_OP														\|\|
+INC_OP														\+\+
+
+//others
+OTHERS 														\(|\)|\[|\]|;|,|\{|\}
+
 %%
-{whitespaces}																//skip
-{keywords}																	{std::cout << "Keyword " << matched() << std::endl;}
-{identifier}																{std::cout << "Identifier " << matched() << std::endl;}
-{c-constant}																{std::cout << "C-Constant " << matched() << std::endl;}
-.																			{std::cout << "Others " << matched() << std::endl;};
+{NOT_OP}													return NOT_OP
+{ASS_OP}													return ASS_OP
+{ADD_OP}													return ADD_OP;
+{SUB_OP}													return SUB_OP;
+{MUL_OP}													return MUL_OP;
+{DIV_OP}													return DIV_OP;
+{LT_OP}														return LT_OP;
+{GL_OP}														return GL_OP;
+{LE_OP}														return LE_OP;
+{GE_OP}														return GE_OP;
+{EQ_OP}														return EQ_OP;
+{NE_OP}														return NE_OP;
+{AND_OP}													return AND_OP;
+{OR_OP}														return OR_OP;
+{INC_OP}													return INC_OP;
+{STRING_LITERAL}											return STRING_LITERAL;
+{void}														return VOID;
+{int}														return INT;
+{float}														return FLOAT;
+{return}													return RETURN;
+{if}														return IF;
+{else}														return ELSE;
+{while}														return WHILE;
+{for}														return FOR;
+{identifiers}												return IDENTIFIER;
+{int_constant}												return INT_CONSTANT;
+{float_constant}											return FLOAT_CONSTANT;
+															return matched();

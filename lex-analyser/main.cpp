@@ -3,23 +3,21 @@
 using namespace std;
 int main()
 {
-  Scanner scanner;   // define a Scanner object
-  while(scanner.lex());
-  /*while (int token = scanner.lex()) // get all tokens
-    {
-      string const &text = scanner.matched();
-      switch (token)
+	Scanner scanner;   // define a Scanner object
+	while (int token = scanner.lex()) // get all tokens
 	{
-	case Scanner::IDENTIFIER:
-	  cout << "identifier: " << text << '\n';
-	  break;
-	case Scanner::NUMBER:
-	  cout << "number: " << text << '\n';
-	  break;
-	default:
-	  cout << "char. token: `" << text << "'\n";
+		string const &text = scanner.matched();
+		switch (token)
+		{
+			case Scanner::IDENTIFIER:
+				cout << "identifier: " << text << '\n';
+				break;
+			case Scanner::NUMBER:
+				cout << "number: " << text << '\n';
+				break;
+			default:
+				cout << "char. token: `" << text << "'\n";
+		}
 	}
-    }
-   */
-    return 0;
+	return 0;
 }
