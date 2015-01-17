@@ -22,23 +22,23 @@ fractional_part												[0-9]*
 exponent_part												[eE][+-][0-9]*[eE][0-9]*
 float_constant												{integer_part}\.{fractional_part}{exponent_part}
 
-STRING_LITERAL												"([^"\\]|\\.)*"
+STRING_LITERAL												\"([^"\\]|\\.)*\"
 
 
 /* Operators */
-NOT_OP														!
+NOT_OP														\!
 ASS_OP														=
 ADD_OP														\+
 SUB_OP														\-
 MUL_OP														\*
 DIV_OP														\/
-LT_OP														<
-GL_OP														>
-LE_OP														<=
-GE_OP														>=
+LT_OP														\<
+GL_OP														\>
+LE_OP														\<=
+GE_OP														\>=
 EQ_OP														==
-NE_OP														!=
-AND_OP														&&
+NE_OP														\!=
+AND_OP														\&\&
 OR_OP														\|\|
 INC_OP														\+\+
 
@@ -46,8 +46,8 @@ INC_OP														\+\+
 OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 
 %%
-{NOT_OP}													return NOT_OP
-{ASS_OP}													return ASS_OP
+{NOT_OP}													return NOT_OP;
+{ASS_OP}													return ASS_OP;
 {ADD_OP}													return ADD_OP;
 {SUB_OP}													return SUB_OP;
 {MUL_OP}													return MUL_OP;
@@ -73,4 +73,4 @@ OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 {identifiers}												return IDENTIFIER;
 {int_constant}												return INT_CONSTANT;
 {float_constant}											return FLOAT_CONSTANT;
-															return matched();
+.															return (int)matched()[0];

@@ -3,7 +3,7 @@ all:    lex.cc  main.cpp
 
 lex.cc: lex.l
 	flexc++ lex.l; 
-	#sed -i '/int lex()/r enums' Scanner.h
+	sed -i '/int lex()/r enums' Scanner.h
 
 clean:
 	rm -f lex.cc Scannerbase.h Scanner.ih Scanner.h lex-analyser
