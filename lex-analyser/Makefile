@@ -1,5 +1,5 @@
-all:   clean lex.cc  main.cpp
-	g++   --std=c++0x lex.cc main.cpp -o lex-analyser
+all:   clean lex.cc  main.cc
+	g++   --std=c++0x lex.cc main.cc -o lex-analyser
 
 lex.cc: lex.l
 	flexc++ lex.l; 

@@ -1,4 +1,4 @@
-whitespaces													[\t\n\r ]*
+whitespaces													[\t\n\r ]
 
 /* keywords */
 
@@ -48,7 +48,7 @@ INC_OP														\+\+
 OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 
 %%
-{whitespaces}												return WHITESPACE;
+{whitespaces}												//return WHITESPACE; Do nothing
 {NOT_OP}													return NOT_OP;
 {ASS_OP}													return ASS_OP;
 {ADD_OP}													return ADD_OP;
@@ -76,4 +76,4 @@ OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 {identifiers}												return IDENTIFIER;
 {float_constant}											return FLOAT_CONSTANT;
 {int_constant}												return INT_CONSTANT;
-.															return (int)matched()[0];
+.															return matched()[0];

@@ -10,4 +10,6 @@ int bin = 0b01001;
 int main()
 {
 	while true;
+	string s = "a\\\\" "abc___--c" "3v4n73q" "\\\\" "\\\t\n\""
 }
+
