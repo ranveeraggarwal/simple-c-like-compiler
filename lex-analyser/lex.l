@@ -24,7 +24,7 @@ fractional_part												[0-9]*
 exponent_part												([eE][+-][0-9]*)|([eE][0-9]*)
 float_constant												({integer_part}\.{fractional_part}{exponent_part})|({integer_part}\.{fractional_part})
 
-STRING_LITERAL												\"([^"\\]|\\.)*\"
+STRING_LITERAL												\"(\\.|[^"\\])*\"
 
 
 /* Operators */
