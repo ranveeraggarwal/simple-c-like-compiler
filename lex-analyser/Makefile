@@ -1,4 +1,4 @@
-all:    lex.cc  main.cpp
+all:   clean lex.cc  main.cpp
 	g++   --std=c++0x lex.cc main.cpp -o lex-analyser
 
 lex.cc: lex.l

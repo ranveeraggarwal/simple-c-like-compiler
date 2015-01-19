@@ -1,3 +1,5 @@
+whitespaces													[\t\n\r ]*
+
 /* keywords */
 
 void														void
@@ -14,13 +16,13 @@ for 														for
 identifiers													[a-zA-Z_][a-zA-Z0-9_]*
 
 /* contants */
-int_constant												[1-9][0-9]*|0[bB][01]*|0[0-7]*|0[xX][0-9a-fA-F]*
+int_constant												([1-9][0-9]*)|(0[bB][01]*)|(0[xX][0-9a-fA-F]*)|(0[0-7]*)
 
 // float contants
 integer_part												[0-9]*
 fractional_part												[0-9]*
-exponent_part												[eE][+-][0-9]*[eE][0-9]*
-float_constant												{integer_part}\.{fractional_part}{exponent_part}
+exponent_part												([eE][+-][0-9]*)|([eE][0-9]*)
+float_constant												({integer_part}\.{fractional_part}{exponent_part})|({integer_part}\.{fractional_part})
 
 STRING_LITERAL												\"([^"\\]|\\.)*\"
 
@@ -46,6 +48,7 @@ INC_OP														\+\+
 OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 
 %%
+{whitespaces}												return WHITESPACE;
 {NOT_OP}													return NOT_OP;
 {ASS_OP}													return ASS_OP;
 {ADD_OP}													return ADD_OP;
@@ -71,6 +74,6 @@ OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 {while}														return WHILE;
 {for}														return FOR;
 {identifiers}												return IDENTIFIER;
-{int_constant}												return INT_CONSTANT;
 {float_constant}											return FLOAT_CONSTANT;
+{int_constant}												return INT_CONSTANT;
 .															return (int)matched()[0];

@@ -1,4 +1,5 @@
         enum Tokens{IDENTIFIER=0x100,
+                    WHITESPACE,
                     NUMBER, 
                     NOT_OP,
                     ASS_OP,

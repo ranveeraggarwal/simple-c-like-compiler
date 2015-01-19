@@ -9,6 +9,8 @@ int main()
 		string const &text = scanner.matched();
 		switch (token)
 		{
+			case Scanner::WHITESPACE:
+				break;
 			case Scanner::IDENTIFIER:
 				cout << "IDENTIFIER: " << text << '\n';
 				break;
@@ -94,7 +96,7 @@ int main()
 				cout << "FLOAT_CONSTANT: " << text << '\n';
 				break;
 			default:
-				cout << "char. token: `" << text << "'\n";
+				cout << "char. token: '" << text << "'\n";
 		}
 	}
 	return 0;
