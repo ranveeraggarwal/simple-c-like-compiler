@@ -29,7 +29,6 @@ STRING_LITERAL												\"(\\.|[^"\\])*\"
 
 /* Operators */
 NOT_OP														\!
-ASS_OP														=
 ADD_OP														\+
 SUB_OP														\-
 MUL_OP														\*
@@ -50,7 +49,6 @@ OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 %%
 {whitespaces}												//return Parser::WHITESPACE; Do nothing
 {NOT_OP}													return Parser::NOT_OP;
-{ASS_OP}													return Parser::ASS_OP;
 {ADD_OP}													return Parser::ADD_OP;
 {SUB_OP}													return Parser::SUB_OP;
 {MUL_OP}													return Parser::MUL_OP;
