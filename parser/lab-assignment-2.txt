@@ -1,0 +1,49 @@
+          
+                    Lab Assignment 1
+                    ----------------
+
+Submission Date: 3rd February 2015, 11:59:59pm
+Evaluation Date: 4th January 2014, Laboratory Hours
+ 
+
+The  purpose of  this  assignment is  to  construct a  parser for  our
+language that outputs the syntax tree in a graphical form. To draw the
+tree,  use  a tool  called  graphviz.   There  are two  components  of
+graphviz that  you will have to  use: The language  for describing the
+tree called DOT and a tool  called dot. For example, if graph1.gv is a
+DOT script describing the tree, then 
+
+ $ dot -Tps graph1.gv -o graph1.ps
+
+generates a postscript  program containg the drawing of  the tree. The
+dot tool will  completely take care of the tree  layout. You just have
+to specify through  the DOT language, the nodes,  their labels and the
+edges.
+
+Specifically you have to do the following:
+
+0. Study the example very carefully.
+
+1. Take  the grammar from  assignment 1 and  convert it as  a bisonc++
+script. Link it with the  lexical analyser generated earlier.  Test it
+using  the  %debug  directive   and  the  egrep  command.  Remove  all
+ambiguities.
+
+2.  Study  the bisonc++  document (uploaded earlier)  to find  out how
+actions are added to a bisonc++ script.
+
+3.   Read  about  the   DOT  language   from  the   attached  document
+dotguide.pdf
+
+4. Add actions to the bisonc++ script so that the output of the parser
+is a DOT script representing the parse tree.
+
+5. This  DOT script,  when processed by  the graphviz tool  called dot
+should produce a postscript file with the diagram of the parse tree.
+
+The parse  tree must exactly  conform to the grammar.   Initially, the
+leafs are to be labelled by the token names and not lexemes. Later, we
+shall show how to also add lexemes.
+
+
+
