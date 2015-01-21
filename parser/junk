@@ -39,8 +39,8 @@
     lookup(7, `opnd'): shift 10 (`opnd' processed)
     push(state 10)
     ==
-    nextToken(): using '\x0a'
-    lookup(10, '\x0a'): default reduction by rule 5
+    nextToken(): using `_EOF_'
+    lookup(10, `_EOF_'): default reduction by rule 5
     executeAction(): of rule 5 ...
     ... action of rule 5 completed
     pop(3) from stack having size 4
@@ -50,7 +50,7 @@
     lookup(0, `instruction'): shift 3 (`instruction' processed)
     push(state 3)
     ==
-    lookup(3, '\x0a'): default reduction by rule 2
+    lookup(3, `_EOF_'): default reduction by rule 2
     executeAction(): of rule 2 ...
     ... action of rule 2 completed
     pop(1) from stack having size 2
@@ -60,33 +60,16 @@
     lookup(0, `instruction_list'): shift 2 (`instruction_list' processed)
     push(state 2)
     ==
-    lookup(2, '\x0a'): shift 6 ('\x0a' processed)
-    push(state 6)
-    ==
-    nextToken(): using '\x0a'
-    lookup(6, '\x0a'): default reduction by rule 7
-    executeAction(): of rule 7 ...
-    ... action of rule 7 completed
-    pop(0) from stack having size 3
-    pop(): next state: 6, token: `optional_label'
-    reduce(): by rule 7 to N-terminal `optional_label'
-    ==
-    lookup(6, `optional_label'): shift 4 (`optional_label' processed)
-    push(state 4)
-    ==
-    lookup(4, '\x0a'): Not found. Start error recovery.
-    errorRecovery(): 1 error(s) so far. State = 4
-    errorRecovery(): pop state 4
-    pop(1) from stack having size 4
-    pop(): next state: 6, token: '\x0a'
-    errorRecovery(): pop state 6
-    pop(1) from stack having size 3
-    pop(): next state: 2, token: '\x0a'
-    errorRecovery(): pop state 2
+    lookup(2, `_EOF_'): default reduction by rule 1
+    executeAction(): of rule 1 ...
+    ... action of rule 1 completed
     pop(1) from stack having size 2
-    pop(): next state: 0, token: '\x0a'
-    errorRecovery(): pop state 0
-    pop(1) from stack having size 1
-    Terminating parse(): unrecoverable input error at token '\x0a'
-    ABORT(): Parsing unsuccessful
-    parse(): returns 1
+    pop(): next state: 0, token: `program'
+    reduce(): by rule 1 to N-terminal `program'
+    ==
+    lookup(0, `program'): shift 1 (`program' processed)
+    push(state 1)
+    ==
+    lookup(1, `_EOF_'): ACCEPT
+    ACCEPT(): Parsing successful
+    parse(): returns 0
