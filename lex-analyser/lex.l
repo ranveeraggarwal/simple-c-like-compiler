@@ -19,10 +19,10 @@ identifiers													[a-zA-Z_][a-zA-Z0-9_]*
 int_constant												([1-9][0-9]*)|(0[bB][01]*)|(0[xX][0-9a-fA-F]*)|(0[0-7]*)
 
 // float contants
-integer_part												[0-9]*
-fractional_part												[0-9]*
-exponent_part												([eE][+-][0-9]*)|([eE][0-9]*)
-float_constant												({integer_part}\.{fractional_part}{exponent_part})|({integer_part}\.{fractional_part})
+integer_part												[0-9]+
+fractional_part												[0-9]+
+exponent_part												[eE][+-]?[0-9]+
+float_constant												({integer_part}\.{fractional_part}{exponent_part})|({integer_part}\.{fractional_part})|({integer_part}\.)|(\.{fractional_part})
 
 STRING_LITERAL												\"(\\.|[^"\\])*\"
 
