@@ -17,7 +17,7 @@ parse.cc: parse.y Parser.ih Parser.h Parserbase.h
 #	./sedscript
      
 clean:
-	rm -f Parser* Scanner* a.out 
+	rm -f Parser* Scanner* a.out lex.cc parse.cc
 
 Parser.ih: parse.y
 Parser.h:  parse.y
