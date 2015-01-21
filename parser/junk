@@ -1,0 +1,35 @@
+    parse(): Parsing starts
+    push(state 0)
+    ==
+    nextToken(): using `INT'
+    lookup(0, `INT'): shift 5 (`INT' processed)
+    push(state 5)
+    ==
+    lookup(5, `_UNDETERMINED_'): default reduction by rule 5
+    executeAction(): of rule 5 ...
+    ... action of rule 5 completed
+    pop(1) from stack having size 2
+    pop(): next state: 0, token: `type_specifier'
+    reduce(): by rule 5 to N-terminal `type_specifier'
+    ==
+    lookup(0, `type_specifier'): shift 3 (`type_specifier' processed)
+    push(state 3)
+    ==
+    nextToken(): using `IDENTIFIER'
+    lookup(3, `IDENTIFIER'): shift 9 (`IDENTIFIER' processed)
+    push(state 9)
+    ==
+    nextToken(): using `ASS_OP'
+    lookup(9, `ASS_OP'): Not found. Start error recovery.
+    errorRecovery(): 1 error(s) so far. State = 9
+    errorRecovery(): pop state 9
+    pop(1) from stack having size 3
+    pop(): next state: 3, token: `ASS_OP'
+    errorRecovery(): pop state 3
+    pop(1) from stack having size 2
+    pop(): next state: 0, token: `ASS_OP'
+    errorRecovery(): pop state 0
+    pop(1) from stack having size 1
+    Terminating parse(): unrecoverable input error at token `ASS_OP'
+    ABORT(): Parsing unsuccessful
+    parse(): returns 1

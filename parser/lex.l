@@ -48,32 +48,32 @@ INC_OP														\+\+
 OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 
 %%
-{whitespaces}												//return WHITESPACE; Do nothing
-{NOT_OP}													return NOT_OP;
-{ASS_OP}													return ASS_OP;
-{ADD_OP}													return ADD_OP;
-{SUB_OP}													return SUB_OP;
-{MUL_OP}													return MUL_OP;
-{DIV_OP}													return DIV_OP;
-{LT_OP}														return LT_OP;
-{GL_OP}														return GL_OP;
-{LE_OP}														return LE_OP;
-{GE_OP}														return GE_OP;
-{EQ_OP}														return EQ_OP;
-{NE_OP}														return NE_OP;
-{AND_OP}													return AND_OP;
-{OR_OP}														return OR_OP;
-{INC_OP}													return INC_OP;
-{STRING_LITERAL}											return STRING_LITERAL;
-{void}														return VOID;
-{int}														return INT;
-{float}														return FLOAT;
-{return}													return RETURN;
-{if}														return IF;
-{else}														return ELSE;
-{while}														return WHILE;
-{for}														return FOR;
-{identifiers}												return IDENTIFIER;
-{float_constant}											return FLOAT_CONSTANT;
-{int_constant}												return INT_CONSTANT;
+{whitespaces}												//return Parser::WHITESPACE; Do nothing
+{NOT_OP}													return Parser::NOT_OP;
+{ASS_OP}													return Parser::ASS_OP;
+{ADD_OP}													return Parser::ADD_OP;
+{SUB_OP}													return Parser::SUB_OP;
+{MUL_OP}													return Parser::MUL_OP;
+{DIV_OP}													return Parser::DIV_OP;
+{LT_OP}														return Parser::LT_OP;
+{GL_OP}														return Parser::GL_OP;
+{LE_OP}														return Parser::LE_OP;
+{GE_OP}														return Parser::GE_OP;
+{EQ_OP}														return Parser::EQ_OP;
+{NE_OP}														return Parser::NE_OP;
+{AND_OP}													return Parser::AND_OP;
+{OR_OP}														return Parser::OR_OP;
+{INC_OP}													return Parser::INC_OP;
+{STRING_LITERAL}											return Parser::STRING_LITERAL;
+{void}														return Parser::VOID;
+{int}														return Parser::INT;
+{float}														return Parser::FLOAT;
+{return}													return Parser::RETURN;
+{if}														return Parser::IF;
+{else}														return Parser::ELSE;
+{while}														return Parser::WHILE;
+{for}														return Parser::FOR;
+{identifiers}												return Parser::IDENTIFIER;
+{float_constant}											return Parser::FLOAT_CONSTANT;
+{int_constant}												return Parser::INT_CONSTANT;
 .															return matched()[0];
