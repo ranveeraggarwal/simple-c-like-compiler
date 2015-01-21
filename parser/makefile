@@ -1,7 +1,7 @@
 all:    lex.cc parse.cc main.cc Scanner.h Scannerbase.h Scanner.ih Parser.h Parserbase.h Parser.ih
 	g++   --std=c++0x lex.cc parse.cc main.cc;
 	./a.out < test-assembly > junk;
-	egrep 'nextToken|reduce' junk
+#	egrep 'nextToken|reduce' junk
         
 
 lex.cc: lex.l Scanner.ih 
@@ -16,6 +16,8 @@ parse.cc: parse.y Parser.ih Parser.h Parserbase.h
 #	sed -i '/ifndef/a #include "tree.hh"' Parserbase.h;
 #	./sedscript
      
+clean:
+	rm -f Parser* Scanner* a.out 
 
 Parser.ih: parse.y
 Parser.h:  parse.y
