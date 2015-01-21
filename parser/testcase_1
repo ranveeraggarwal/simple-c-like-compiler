@@ -1,17 +1,4 @@
-int aasdf = 224;
-int x = 1123;
-float alpha = 12.234;
-float phh = 001.23942;
-float beta = 0.008e-12;
-float gamma = 1.;
-int theta = 0234;
-int hexa = 0x1234;
-int octa = 03428;
-int bin = 0b01001;
-float delta = 1.;
 int main()
 {
-	while true;
-	string s = "a\\\\" "abc___--c" "3v4n73q" "\\\\" "\\\t\n\"";
+	while(true);
 }
-
