@@ -7,6 +7,9 @@
 %%
 translation_unit: 
 	  function_definition
+	  {
+	  	dotfile << $$<<endl;
+	  }
 	| translation_unit function_definition
 	;
 

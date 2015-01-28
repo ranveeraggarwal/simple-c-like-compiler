@@ -41,8 +41,70 @@
     lookup(8, `{' (123)): shift 11 (`{' (123) processed)
     push(state 11)
     ==
+    nextToken(): using `INT'
+    lookup(11, `INT'): shift 5 (`INT' processed)
+    push(state 5)
+    ==
+    lookup(5, `_UNDETERMINED_'): default reduction by rule 5
+    executeAction(): of rule 5 ...
+    ... action of rule 5 completed
+    pop(1) from stack having size 5
+    pop(): next state: 11, token: `type_specifier'
+    reduce(): by rule 5 to N-terminal `type_specifier'
+    ==
+    lookup(11, `type_specifier'): shift 23 (`type_specifier' processed)
+    push(state 23)
+    ==
+    nextToken(): using `IDENTIFIER'
+    lookup(23, `IDENTIFIER'): shift 58 (`IDENTIFIER' processed)
+    push(state 58)
+    ==
+    lookup(58, `_UNDETERMINED_'): default reduction by rule 12
+    executeAction(): of rule 12 ...
+    ... action of rule 12 completed
+    pop(1) from stack having size 6
+    pop(): next state: 23, token: `declarator'
+    reduce(): by rule 12 to N-terminal `declarator'
+    ==
+    lookup(23, `declarator'): shift 57 (`declarator' processed)
+    push(state 57)
+    ==
+    nextToken(): using `;' (59)
+    lookup(57, `;' (59)): default reduction by rule 69
+    executeAction(): of rule 69 ...
+    ... action of rule 69 completed
+    pop(1) from stack having size 6
+    pop(): next state: 23, token: `declarator_list'
+    reduce(): by rule 69 to N-terminal `declarator_list'
+    ==
+    lookup(23, `declarator_list'): shift 56 (`declarator_list' processed)
+    push(state 56)
+    ==
+    lookup(56, `;' (59)): shift 85 (`;' (59) processed)
+    push(state 85)
+    ==
+    lookup(85, `_UNDETERMINED_'): default reduction by rule 68
+    executeAction(): of rule 68 ...
+    ... action of rule 68 completed
+    pop(3) from stack having size 7
+    pop(): next state: 11, token: `declaration'
+    reduce(): by rule 68 to N-terminal `declaration'
+    ==
+    lookup(11, `declaration'): shift 17 (`declaration' processed)
+    push(state 17)
+    ==
+    lookup(17, `_UNDETERMINED_'): default reduction by rule 66
+    executeAction(): of rule 66 ...
+    ... action of rule 66 completed
+    pop(1) from stack having size 5
+    pop(): next state: 11, token: `declaration_list'
+    reduce(): by rule 66 to N-terminal `declaration_list'
+    ==
+    lookup(11, `declaration_list'): shift 15 (`declaration_list' processed)
+    push(state 15)
+    ==
     nextToken(): using `WHILE'
-    lookup(11, `WHILE'): shift 25 (`WHILE' processed)
+    lookup(15, `WHILE'): shift 25 (`WHILE' processed)
     push(state 25)
     ==
     nextToken(): using `(' (40)
@@ -57,7 +119,7 @@
     lookup(48, `)' (41)): default reduction by rule 57
     executeAction(): of rule 57 ...
     ... action of rule 57 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `l_expression'
     reduce(): by rule 57 to N-terminal `l_expression'
     ==
@@ -67,7 +129,7 @@
     lookup(49, `)' (41)): default reduction by rule 52
     executeAction(): of rule 52 ...
     ... action of rule 52 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `primary_expression'
     reduce(): by rule 52 to N-terminal `primary_expression'
     ==
@@ -77,7 +139,7 @@
     lookup(47, `)' (41)): default reduction by rule 48
     executeAction(): of rule 48 ...
     ... action of rule 48 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `postfix_expression'
     reduce(): by rule 48 to N-terminal `postfix_expression'
     ==
@@ -87,7 +149,7 @@
     lookup(45, `)' (41)): default reduction by rule 46
     executeAction(): of rule 46 ...
     ... action of rule 46 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `unary_expression'
     reduce(): by rule 46 to N-terminal `unary_expression'
     ==
@@ -97,7 +159,7 @@
     lookup(44, `)' (41)): default reduction by rule 43
     executeAction(): of rule 43 ...
     ... action of rule 43 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `multiplicative_expression'
     reduce(): by rule 43 to N-terminal `multiplicative_expression'
     ==
@@ -107,7 +169,7 @@
     lookup(43, `)' (41)): default reduction by rule 40
     executeAction(): of rule 40 ...
     ... action of rule 40 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `additive_expression'
     reduce(): by rule 40 to N-terminal `additive_expression'
     ==
@@ -117,7 +179,7 @@
     lookup(42, `)' (41)): default reduction by rule 35
     executeAction(): of rule 35 ...
     ... action of rule 35 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `relational_expression'
     reduce(): by rule 35 to N-terminal `relational_expression'
     ==
@@ -127,7 +189,7 @@
     lookup(41, `)' (41)): default reduction by rule 32
     executeAction(): of rule 32 ...
     ... action of rule 32 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `equality_expression'
     reduce(): by rule 32 to N-terminal `equality_expression'
     ==
@@ -137,7 +199,7 @@
     lookup(40, `)' (41)): default reduction by rule 30
     executeAction(): of rule 30 ...
     ... action of rule 30 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `logical_and_expression'
     reduce(): by rule 30 to N-terminal `logical_and_expression'
     ==
@@ -147,7 +209,7 @@
     lookup(39, `)' (41)): default reduction by rule 28
     executeAction(): of rule 28 ...
     ... action of rule 28 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 60, token: `expression'
     reduce(): by rule 28 to N-terminal `expression'
     ==
@@ -164,7 +226,7 @@
     lookup(27, `_UNDETERMINED_'): default reduction by rule 26
     executeAction(): of rule 26 ...
     ... action of rule 26 completed
-    pop(1) from stack having size 9
+    pop(1) from stack having size 10
     pop(): next state: 115, token: `assignment_statement'
     reduce(): by rule 26 to N-terminal `assignment_statement'
     ==
@@ -174,7 +236,7 @@
     lookup(21, `_UNDETERMINED_'): default reduction by rule 24
     executeAction(): of rule 24 ...
     ... action of rule 24 completed
-    pop(1) from stack having size 9
+    pop(1) from stack having size 10
     pop(): next state: 115, token: `statement'
     reduce(): by rule 24 to N-terminal `statement'
     ==
@@ -184,45 +246,45 @@
     lookup(123, `_UNDETERMINED_'): default reduction by rule 64
     executeAction(): of rule 64 ...
     ... action of rule 64 completed
-    pop(5) from stack having size 9
-    pop(): next state: 11, token: `iteration_statement'
+    pop(5) from stack having size 10
+    pop(): next state: 15, token: `iteration_statement'
     reduce(): by rule 64 to N-terminal `iteration_statement'
     ==
-    lookup(11, `iteration_statement'): shift 20 (`iteration_statement' processed)
+    lookup(15, `iteration_statement'): shift 20 (`iteration_statement' processed)
     push(state 20)
     ==
     lookup(20, `_UNDETERMINED_'): default reduction by rule 23
     executeAction(): of rule 23 ...
     ... action of rule 23 completed
-    pop(1) from stack having size 5
-    pop(): next state: 11, token: `statement'
+    pop(1) from stack having size 6
+    pop(): next state: 15, token: `statement'
     reduce(): by rule 23 to N-terminal `statement'
     ==
-    lookup(11, `statement'): shift 16 (`statement' processed)
+    lookup(15, `statement'): shift 16 (`statement' processed)
     push(state 16)
     ==
     lookup(16, `_UNDETERMINED_'): default reduction by rule 19
     executeAction(): of rule 19 ...
     ... action of rule 19 completed
-    pop(1) from stack having size 5
-    pop(): next state: 11, token: `statement_list'
+    pop(1) from stack having size 6
+    pop(): next state: 15, token: `statement_list'
     reduce(): by rule 19 to N-terminal `statement_list'
     ==
-    lookup(11, `statement_list'): shift 14 (`statement_list' processed)
-    push(state 14)
+    lookup(15, `statement_list'): shift 36 (`statement_list' processed)
+    push(state 36)
     ==
     nextToken(): using `IDENTIFIER'
-    lookup(14, `IDENTIFIER'): shift 29 (`IDENTIFIER' processed)
+    lookup(36, `IDENTIFIER'): shift 29 (`IDENTIFIER' processed)
     push(state 29)
     ==
     lookup(29, `_UNDETERMINED_'): default reduction by rule 57
     executeAction(): of rule 57 ...
     ... action of rule 57 completed
-    pop(1) from stack having size 6
-    pop(): next state: 14, token: `l_expression'
+    pop(1) from stack having size 7
+    pop(): next state: 36, token: `l_expression'
     reduce(): by rule 57 to N-terminal `l_expression'
     ==
-    lookup(14, `l_expression'): shift 28 (`l_expression' processed)
+    lookup(36, `l_expression'): shift 28 (`l_expression' processed)
     push(state 28)
     ==
     nextToken(): using `=' (61)
@@ -236,7 +298,7 @@
     lookup(52, `_UNDETERMINED_'): default reduction by rule 53
     executeAction(): of rule 53 ...
     ... action of rule 53 completed
-    pop(1) from stack having size 8
+    pop(1) from stack having size 9
     pop(): next state: 62, token: `primary_expression'
     reduce(): by rule 53 to N-terminal `primary_expression'
     ==
@@ -246,7 +308,7 @@
     lookup(47, `_UNDETERMINED_'): default reduction by rule 48
     executeAction(): of rule 48 ...
     ... action of rule 48 completed
-    pop(1) from stack having size 8
+    pop(1) from stack having size 9
     pop(): next state: 62, token: `postfix_expression'
     reduce(): by rule 48 to N-terminal `postfix_expression'
     ==
@@ -256,7 +318,7 @@
     lookup(45, `_UNDETERMINED_'): default reduction by rule 46
     executeAction(): of rule 46 ...
     ... action of rule 46 completed
-    pop(1) from stack having size 8
+    pop(1) from stack having size 9
     pop(): next state: 62, token: `unary_expression'
     reduce(): by rule 46 to N-terminal `unary_expression'
     ==
@@ -266,7 +328,7 @@
     lookup(44, `_UNDETERMINED_'): default reduction by rule 43
     executeAction(): of rule 43 ...
     ... action of rule 43 completed
-    pop(1) from stack having size 8
+    pop(1) from stack having size 9
     pop(): next state: 62, token: `multiplicative_expression'
     reduce(): by rule 43 to N-terminal `multiplicative_expression'
     ==
@@ -277,7 +339,7 @@
     lookup(43, `;' (59)): default reduction by rule 40
     executeAction(): of rule 40 ...
     ... action of rule 40 completed
-    pop(1) from stack having size 8
+    pop(1) from stack having size 9
     pop(): next state: 62, token: `additive_expression'
     reduce(): by rule 40 to N-terminal `additive_expression'
     ==
@@ -287,7 +349,7 @@
     lookup(42, `;' (59)): default reduction by rule 35
     executeAction(): of rule 35 ...
     ... action of rule 35 completed
-    pop(1) from stack having size 8
+    pop(1) from stack having size 9
     pop(): next state: 62, token: `relational_expression'
     reduce(): by rule 35 to N-terminal `relational_expression'
     ==
@@ -297,7 +359,7 @@
     lookup(41, `;' (59)): default reduction by rule 32
     executeAction(): of rule 32 ...
     ... action of rule 32 completed
-    pop(1) from stack having size 8
+    pop(1) from stack having size 9
     pop(): next state: 62, token: `equality_expression'
     reduce(): by rule 32 to N-terminal `equality_expression'
     ==
@@ -307,7 +369,7 @@
     lookup(40, `;' (59)): default reduction by rule 30
     executeAction(): of rule 30 ...
     ... action of rule 30 completed
-    pop(1) from stack having size 8
+    pop(1) from stack having size 9
     pop(): next state: 62, token: `logical_and_expression'
     reduce(): by rule 30 to N-terminal `logical_and_expression'
     ==
@@ -317,7 +379,7 @@
     lookup(39, `;' (59)): default reduction by rule 28
     executeAction(): of rule 28 ...
     ... action of rule 28 completed
-    pop(1) from stack having size 8
+    pop(1) from stack having size 9
     pop(): next state: 62, token: `expression'
     reduce(): by rule 28 to N-terminal `expression'
     ==
@@ -330,35 +392,35 @@
     lookup(117, `_UNDETERMINED_'): default reduction by rule 27
     executeAction(): of rule 27 ...
     ... action of rule 27 completed
-    pop(4) from stack having size 9
-    pop(): next state: 14, token: `assignment_statement'
+    pop(4) from stack having size 10
+    pop(): next state: 36, token: `assignment_statement'
     reduce(): by rule 27 to N-terminal `assignment_statement'
     ==
-    lookup(14, `assignment_statement'): shift 21 (`assignment_statement' processed)
+    lookup(36, `assignment_statement'): shift 21 (`assignment_statement' processed)
     push(state 21)
     ==
     lookup(21, `_UNDETERMINED_'): default reduction by rule 24
     executeAction(): of rule 24 ...
     ... action of rule 24 completed
-    pop(1) from stack having size 6
-    pop(): next state: 14, token: `statement'
+    pop(1) from stack having size 7
+    pop(): next state: 36, token: `statement'
     reduce(): by rule 24 to N-terminal `statement'
     ==
-    lookup(14, `statement'): shift 35 (`statement' processed)
+    lookup(36, `statement'): shift 35 (`statement' processed)
     push(state 35)
     ==
     lookup(35, `_UNDETERMINED_'): default reduction by rule 20
     executeAction(): of rule 20 ...
     ... action of rule 20 completed
-    pop(2) from stack having size 6
-    pop(): next state: 11, token: `statement_list'
+    pop(2) from stack having size 7
+    pop(): next state: 15, token: `statement_list'
     reduce(): by rule 20 to N-terminal `statement_list'
     ==
-    lookup(11, `statement_list'): shift 14 (`statement_list' processed)
-    push(state 14)
+    lookup(15, `statement_list'): shift 36 (`statement_list' processed)
+    push(state 36)
     ==
     nextToken(): using `RETURN'
-    lookup(14, `RETURN'): shift 22 (`RETURN' processed)
+    lookup(36, `RETURN'): shift 22 (`RETURN' processed)
     push(state 22)
     ==
     nextToken(): using `INT_CONSTANT'
@@ -368,7 +430,7 @@
     lookup(52, `_UNDETERMINED_'): default reduction by rule 53
     executeAction(): of rule 53 ...
     ... action of rule 53 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 22, token: `primary_expression'
     reduce(): by rule 53 to N-terminal `primary_expression'
     ==
@@ -378,7 +440,7 @@
     lookup(47, `_UNDETERMINED_'): default reduction by rule 48
     executeAction(): of rule 48 ...
     ... action of rule 48 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 22, token: `postfix_expression'
     reduce(): by rule 48 to N-terminal `postfix_expression'
     ==
@@ -388,7 +450,7 @@
     lookup(45, `_UNDETERMINED_'): default reduction by rule 46
     executeAction(): of rule 46 ...
     ... action of rule 46 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 22, token: `unary_expression'
     reduce(): by rule 46 to N-terminal `unary_expression'
     ==
@@ -398,7 +460,7 @@
     lookup(44, `_UNDETERMINED_'): default reduction by rule 43
     executeAction(): of rule 43 ...
     ... action of rule 43 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 22, token: `multiplicative_expression'
     reduce(): by rule 43 to N-terminal `multiplicative_expression'
     ==
@@ -409,7 +471,7 @@
     lookup(43, `;' (59)): default reduction by rule 40
     executeAction(): of rule 40 ...
     ... action of rule 40 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 22, token: `additive_expression'
     reduce(): by rule 40 to N-terminal `additive_expression'
     ==
@@ -419,7 +481,7 @@
     lookup(42, `;' (59)): default reduction by rule 35
     executeAction(): of rule 35 ...
     ... action of rule 35 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 22, token: `relational_expression'
     reduce(): by rule 35 to N-terminal `relational_expression'
     ==
@@ -429,7 +491,7 @@
     lookup(41, `;' (59)): default reduction by rule 32
     executeAction(): of rule 32 ...
     ... action of rule 32 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 22, token: `equality_expression'
     reduce(): by rule 32 to N-terminal `equality_expression'
     ==
@@ -439,7 +501,7 @@
     lookup(40, `;' (59)): default reduction by rule 30
     executeAction(): of rule 30 ...
     ... action of rule 30 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 22, token: `logical_and_expression'
     reduce(): by rule 30 to N-terminal `logical_and_expression'
     ==
@@ -449,7 +511,7 @@
     lookup(39, `;' (59)): default reduction by rule 28
     executeAction(): of rule 28 ...
     ... action of rule 28 completed
-    pop(1) from stack having size 7
+    pop(1) from stack having size 8
     pop(): next state: 22, token: `expression'
     reduce(): by rule 28 to N-terminal `expression'
     ==
@@ -462,33 +524,33 @@
     lookup(68, `_UNDETERMINED_'): default reduction by rule 25
     executeAction(): of rule 25 ...
     ... action of rule 25 completed
-    pop(3) from stack having size 8
-    pop(): next state: 14, token: `statement'
+    pop(3) from stack having size 9
+    pop(): next state: 36, token: `statement'
     reduce(): by rule 25 to N-terminal `statement'
     ==
-    lookup(14, `statement'): shift 35 (`statement' processed)
+    lookup(36, `statement'): shift 35 (`statement' processed)
     push(state 35)
     ==
     lookup(35, `_UNDETERMINED_'): default reduction by rule 20
     executeAction(): of rule 20 ...
     ... action of rule 20 completed
-    pop(2) from stack having size 6
-    pop(): next state: 11, token: `statement_list'
+    pop(2) from stack having size 7
+    pop(): next state: 15, token: `statement_list'
     reduce(): by rule 20 to N-terminal `statement_list'
     ==
-    lookup(11, `statement_list'): shift 14 (`statement_list' processed)
-    push(state 14)
+    lookup(15, `statement_list'): shift 36 (`statement_list' processed)
+    push(state 36)
     ==
     nextToken(): using `}' (125)
-    lookup(14, `}' (125)): shift 34 (`}' (125) processed)
-    push(state 34)
+    lookup(36, `}' (125)): shift 67 (`}' (125) processed)
+    push(state 67)
     ==
-    lookup(34, `_UNDETERMINED_'): default reduction by rule 17
-    executeAction(): of rule 17 ...
-    ... action of rule 17 completed
-    pop(3) from stack having size 6
+    lookup(67, `_UNDETERMINED_'): default reduction by rule 18
+    executeAction(): of rule 18 ...
+    ... action of rule 18 completed
+    pop(4) from stack having size 7
     pop(): next state: 8, token: `compound_statement'
-    reduce(): by rule 17 to N-terminal `compound_statement'
+    reduce(): by rule 18 to N-terminal `compound_statement'
     ==
     lookup(8, `compound_statement'): shift 10 (`compound_statement' processed)
     push(state 10)

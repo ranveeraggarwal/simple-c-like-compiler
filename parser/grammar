@@ -11,7 +11,7 @@ start symbol is translation_unit
 
 ----------------------------------------------------
 translation_unit
-	: function_definition
+	: function_definition { cout<<$$<<$1<<endl;}
 	| translation_unit function_definition
 	;
 
