@@ -2,6 +2,8 @@ all:    lex.cc parse.cc main.cc Scanner.h Scannerbase.h Scanner.ih Parser.h Pars
 	g++   --std=c++0x lex.cc parse.cc main.cc;
 	./a.out < testcase_1 > junk;
 	egrep 'nextToken|reduce' junk
+	dot -Tps dotfile.gv -o dotgraph.ps
+	gnome-open dotgraph.ps
         
 
 lex.cc: lex.l Scanner.ih 
@@ -17,7 +19,7 @@ parse.cc: parse.y Parser.ih Parser.h Parserbase.h
 #	./sedscript
      
 clean:
-	rm -f Parser* Scanner* a.out lex.cc parse.cc
+	rm -f Parser.ih Parserbase.h Scanner* a.out lex.cc parse.cc
 
 Parser.ih: parse.y
 Parser.h:  parse.y
