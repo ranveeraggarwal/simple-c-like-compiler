@@ -1,121 +1,121 @@
-digraph G{
+strict digraph G{
 	rank=same
-type_specifier_1 [label="type_specifier"]
-TERMINAL_2 [label="INT"]
-type_specifier_1 -> TERMINAL_2
-fun_declarator_3 [label="fun_declarator"]
-TERMINAL_4 [label="IDENTIFIER"]
-TERMINAL_5 [label="("]
-TERMINAL_6 [label=")"]
-type_specifier_7 [label="type_specifier"]
-TERMINAL_8 [label="INT"]
-type_specifier_7 -> TERMINAL_8
-declarator_9 [label="declarator"]
-TERMINAL_10 [label="IDENTIFIER"]
-declarator_9 -> TERMINAL_10
-declarator_list_11 [label="declarator_list"]
-declarator_list_11 -> declarator_9
-declaration_12 [label="declarator_list"]
-TERMINAL_13 [label=";"]
-declaration_12 -> { type_specifier_7 declarator_list_11 TERMINAL_13}
-declaration_list_14 [label="declaration_list"]
-declaration_list_14 -> declaration_12
-l_expression_15 [label="l_expression"]
-TERMINAL_16 [label="IDENTIFIER"]
-l_expression_15 -> TERMINAL_16
-primary_expression_17 [label="primary_expression"]
-primary_expression_17 -> l_expression_15
-postfix_expression_18 [label="postfix_expression"]
-postfix_expression_18 -> primary_expression_17
-unary_expression_19 [label="unary_expression"]
-unary_expression_19 -> postfix_expression_18
-multiplicative_expression_20 [label="multiplicative_expression"]
-multiplicative_expression_20 -> unary_expression_19
-additive_expression_21 [label="additive_expression"]
-additive_expression_21 -> multiplicative_expression_20
-relational_expression_22 [label="relational_expression"]
-relational_expression_22 -> additive_expression_21
-equality_expression_23 [label="equality_expression"]
-equality_expression_23 -> relational_expression_22
-logical_and_expression_24 [label="logical_and_expression"]
-logical_and_expression_24 -> equality_expression_23
-expression_25 [label="expression"]
-expression_25 -> logical_and_expression_24
-assignment_statement_26 [label="assignment_statement"]
-TERMINAL_27 [label=";"]
-assignment_statement_26 -> TERMINAL_27
-statement_28 [label="statement"]
-statement_28 -> assignment_statement_26
-iteration_statement_29 [label="iteration_statement"]
-TERMINAL_30 [label="WHILE"]
-TERMINAL_31 [label="("]
-TERMINAL_32 [label=")"]
-iteration_statement_29 -> { TERMINAL_30 TERMINAL_31 expression_25 TERMINAL_32 statement_28}
-statement_33 [label="statement"]
-statement_33 -> iteration_statement_29
-statement_list_34 [label="statement_list"]
-statement_list_34 -> statement_33
-l_expression_35 [label="l_expression"]
-TERMINAL_36 [label="IDENTIFIER"]
-l_expression_35 -> TERMINAL_36
-primary_expression_37 [label="primary_expression"]
-TERMINAL_38 [label="INT_CONSTANT"]
-primary_expression_37 -> TERMINAL_38
-postfix_expression_39 [label="postfix_expression"]
-postfix_expression_39 -> primary_expression_37
-unary_expression_40 [label="unary_expression"]
-unary_expression_40 -> postfix_expression_39
-multiplicative_expression_41 [label="multiplicative_expression"]
-multiplicative_expression_41 -> unary_expression_40
-additive_expression_42 [label="additive_expression"]
-additive_expression_42 -> multiplicative_expression_41
-relational_expression_43 [label="relational_expression"]
-relational_expression_43 -> additive_expression_42
-equality_expression_44 [label="equality_expression"]
-equality_expression_44 -> relational_expression_43
-logical_and_expression_45 [label="logical_and_expression"]
-logical_and_expression_45 -> equality_expression_44
-expression_46 [label="expression"]
-expression_46 -> logical_and_expression_45
-assignment_statement_47 [label="assignment_statement"]
-TERMINAL_48 [label="="]
-TERMINAL_49 [label=";"]
-assignment_statement_47 -> {l_expression_35 TERMINAL_48 expression_46 TERMINAL_49 }
-statement_50 [label="statement"]
-statement_50 -> assignment_statement_47
-statement_list_51 [label="statement_list"]
-statement_list_51 -> {statement_list_34 statement_50}
-primary_expression_52 [label="primary_expression"]
-TERMINAL_53 [label="INT_CONSTANT"]
-primary_expression_52 -> TERMINAL_53
-postfix_expression_54 [label="postfix_expression"]
-postfix_expression_54 -> primary_expression_52
-unary_expression_55 [label="unary_expression"]
-unary_expression_55 -> postfix_expression_54
-multiplicative_expression_56 [label="multiplicative_expression"]
-multiplicative_expression_56 -> unary_expression_55
-additive_expression_57 [label="additive_expression"]
-additive_expression_57 -> multiplicative_expression_56
-relational_expression_58 [label="relational_expression"]
-relational_expression_58 -> additive_expression_57
-equality_expression_59 [label="equality_expression"]
-equality_expression_59 -> relational_expression_58
-logical_and_expression_60 [label="logical_and_expression"]
-logical_and_expression_60 -> equality_expression_59
-expression_61 [label="expression"]
-expression_61 -> logical_and_expression_60
-statement_62 [label="statement"]
-TERMINAL_63 [label="RETURN"]
-TERMINAL_64 [label=";"]
-statement_62 -> {TERMINAL_63 expression_61 TERMINAL_64}
-statement_list_65 [label="statement_list"]
-statement_list_65 -> {statement_list_51 statement_62}
-compound_statement_66 [label="compound_statement"]
-TERMINAL_67 [label="{"]
-TERMINAL_68 [label="}"]
-compound_statement_66 -> {TERMINAL_67 declaration_list_14 statement_list_65 TERMINAL_68}
-function_definition_69 [label="function_definition"]
-function_definition_69 -> {type_specifier_1 fun_declarator_3 compound_statement_66}
+	type_specifier_1 [label="type_specifier"]
+	TERMINAL_2 [label="INT"]
+	type_specifier_1 -> TERMINAL_2
+	fun_declarator_3 [label="fun_declarator"]
+	TERMINAL_4 [label="IDENTIFIER"]
+	TERMINAL_5 [label="("]
+	TERMINAL_6 [label=")"]
+	type_specifier_7 [label="type_specifier"]
+	TERMINAL_8 [label="INT"]
+	type_specifier_7 -> TERMINAL_8
+	declarator_9 [label="declarator"]
+	TERMINAL_10 [label="IDENTIFIER"]
+	declarator_9 -> TERMINAL_10
+	declarator_list_11 [label="declarator_list"]
+	declarator_list_11 -> declarator_9
+	declaration_12 [label="declarator_list"]
+	TERMINAL_13 [label=";"]
+	declaration_12 -> { type_specifier_7 declarator_list_11 TERMINAL_13}
+	declaration_list_14 [label="declaration_list"]
+	declaration_list_14 -> declaration_12
+	l_expression_15 [label="l_expression"]
+	TERMINAL_16 [label="IDENTIFIER"]
+	l_expression_15 -> TERMINAL_16
+	primary_expression_17 [label="primary_expression"]
+	primary_expression_17 -> l_expression_15
+	postfix_expression_18 [label="postfix_expression"]
+	postfix_expression_18 -> primary_expression_17
+	unary_expression_19 [label="unary_expression"]
+	unary_expression_19 -> postfix_expression_18
+	multiplicative_expression_20 [label="multiplicative_expression"]
+	multiplicative_expression_20 -> unary_expression_19
+	additive_expression_21 [label="additive_expression"]
+	additive_expression_21 -> multiplicative_expression_20
+	relational_expression_22 [label="relational_expression"]
+	relational_expression_22 -> additive_expression_21
+	equality_expression_23 [label="equality_expression"]
+	equality_expression_23 -> relational_expression_22
+	logical_and_expression_24 [label="logical_and_expression"]
+	logical_and_expression_24 -> equality_expression_23
+	expression_25 [label="expression"]
+	expression_25 -> logical_and_expression_24
+	assignment_statement_26 [label="assignment_statement"]
+	TERMINAL_27 [label=";"]
+	assignment_statement_26 -> TERMINAL_27
+	statement_28 [label="statement"]
+	statement_28 -> assignment_statement_26
+	iteration_statement_29 [label="iteration_statement"]
+	TERMINAL_30 [label="WHILE"]
+	TERMINAL_31 [label="("]
+	TERMINAL_32 [label=")"]
+	iteration_statement_29 -> { TERMINAL_30 TERMINAL_31 expression_25 TERMINAL_32 statement_28}
+	statement_33 [label="statement"]
+	statement_33 -> iteration_statement_29
+	statement_list_34 [label="statement_list"]
+	statement_list_34 -> statement_33
+	l_expression_35 [label="l_expression"]
+	TERMINAL_36 [label="IDENTIFIER"]
+	l_expression_35 -> TERMINAL_36
+	primary_expression_37 [label="primary_expression"]
+	TERMINAL_38 [label="INT_CONSTANT"]
+	primary_expression_37 -> TERMINAL_38
+	postfix_expression_39 [label="postfix_expression"]
+	postfix_expression_39 -> primary_expression_37
+	unary_expression_40 [label="unary_expression"]
+	unary_expression_40 -> postfix_expression_39
+	multiplicative_expression_41 [label="multiplicative_expression"]
+	multiplicative_expression_41 -> unary_expression_40
+	additive_expression_42 [label="additive_expression"]
+	additive_expression_42 -> multiplicative_expression_41
+	relational_expression_43 [label="relational_expression"]
+	relational_expression_43 -> additive_expression_42
+	equality_expression_44 [label="equality_expression"]
+	equality_expression_44 -> relational_expression_43
+	logical_and_expression_45 [label="logical_and_expression"]
+	logical_and_expression_45 -> equality_expression_44
+	expression_46 [label="expression"]
+	expression_46 -> logical_and_expression_45
+	assignment_statement_47 [label="assignment_statement"]
+	TERMINAL_48 [label="="]
+	TERMINAL_49 [label=";"]
+	assignment_statement_47 -> {l_expression_35 TERMINAL_48 expression_46 TERMINAL_49 }
+	statement_50 [label="statement"]
+	statement_50 -> assignment_statement_47
+	statement_list_51 [label="statement_list"]
+	statement_list_51 -> {statement_list_34 statement_50}
+	primary_expression_52 [label="primary_expression"]
+	TERMINAL_53 [label="INT_CONSTANT"]
+	primary_expression_52 -> TERMINAL_53
+	postfix_expression_54 [label="postfix_expression"]
+	postfix_expression_54 -> primary_expression_52
+	unary_expression_55 [label="unary_expression"]
+	unary_expression_55 -> postfix_expression_54
+	multiplicative_expression_56 [label="multiplicative_expression"]
+	multiplicative_expression_56 -> unary_expression_55
+	additive_expression_57 [label="additive_expression"]
+	additive_expression_57 -> multiplicative_expression_56
+	relational_expression_58 [label="relational_expression"]
+	relational_expression_58 -> additive_expression_57
+	equality_expression_59 [label="equality_expression"]
+	equality_expression_59 -> relational_expression_58
+	logical_and_expression_60 [label="logical_and_expression"]
+	logical_and_expression_60 -> equality_expression_59
+	expression_61 [label="expression"]
+	expression_61 -> logical_and_expression_60
+	statement_62 [label="statement"]
+	TERMINAL_63 [label="RETURN"]
+	TERMINAL_64 [label=";"]
+	statement_62 -> {TERMINAL_63 expression_61 TERMINAL_64}
+	statement_list_65 [label="statement_list"]
+	statement_list_65 -> {statement_list_51 statement_62}
+	compound_statement_66 [label="compound_statement"]
+	TERMINAL_67 [label="{"]
+	TERMINAL_68 [label="}"]
+	compound_statement_66 -> {TERMINAL_67 declaration_list_14 statement_list_65 TERMINAL_68}
+	function_definition_69 [label="function_definition"]
+	function_definition_69 -> {type_specifier_1 fun_declarator_3 compound_statement_66}
 	translation_unit_70 [label="translation_unit"]
 	translation_unit_70 -> function_definition_69
 }
