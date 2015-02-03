@@ -49,10 +49,13 @@ OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 %%
 {whitespaces}												//return Parser::WHITESPACE; Do nothing
 {NOT_OP}													return Parser::NOT_OP;
+{INC_OP}													return Parser::INC_OP;
 {ADD_OP}													return Parser::ADD_OP;
 {SUB_OP}													return Parser::SUB_OP;
 {MUL_OP}													return Parser::MUL_OP;
 {DIV_OP}													return Parser::DIV_OP;
+{LE_OP}														return Parser::LE_OP;
+{GE_OP}														return Parser::GE_OP;
 {LT_OP}														return Parser::LT_OP;
 {GL_OP}														return Parser::GL_OP;
 {LE_OP}														return Parser::LE_OP;
@@ -61,7 +64,6 @@ OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 {NE_OP}														return Parser::NE_OP;
 {AND_OP}													return Parser::AND_OP;
 {OR_OP}														return Parser::OR_OP;
-{INC_OP}													return Parser::INC_OP;
 {STRING_LITERAL}											return Parser::STRING_LITERAL;
 {void}														return Parser::VOID;
 {int}														return Parser::INT;

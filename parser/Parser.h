@@ -25,7 +25,7 @@ class Parser: public ParserBase
         Parser(){
             node = 0;
             dotfile.open("dotfile.gv", ios::out | ios::trunc);
-            dotfile << "strict digraph G{\n\trank=same"<<endl;
+            dotfile << "strict digraph G{\n\tordering=out\n\trank=same"<<endl;
             dotfile.close();
             dotfile.open("dotfile.gv", ios::out | ios::app);
         }

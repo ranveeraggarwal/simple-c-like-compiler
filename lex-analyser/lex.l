@@ -55,10 +55,10 @@ OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 {SUB_OP}													return SUB_OP;
 {MUL_OP}													return MUL_OP;
 {DIV_OP}													return DIV_OP;
-{LT_OP}														return LT_OP;
-{GL_OP}														return GL_OP;
 {LE_OP}														return LE_OP;
 {GE_OP}														return GE_OP;
+{LT_OP}														return LT_OP;
+{GL_OP}														return GL_OP;
 {EQ_OP}														return EQ_OP;
 {NE_OP}														return NE_OP;
 {AND_OP}													return AND_OP;
