@@ -19,7 +19,7 @@ strict digraph G{
 	declarator_9 -> TERMINAL_10
 	declarator_list_11 [label="declarator_list"]
 	declarator_list_11 -> declarator_9
-	declaration_12 [label="declarator_list"]
+	declaration_12 [label="declaration"]
 	TERMINAL_13 [label=";"]
 	declaration_12 -> type_specifier_7
 	declaration_12 -> declarator_list_11
@@ -34,7 +34,7 @@ strict digraph G{
 	declarator_17 -> TERMINAL_18
 	declarator_list_19 [label="declarator_list"]
 	declarator_list_19 -> declarator_17
-	declaration_20 [label="declarator_list"]
+	declaration_20 [label="declaration"]
 	TERMINAL_21 [label=";"]
 	declaration_20 -> type_specifier_15
 	declaration_20 -> declarator_list_19
@@ -50,7 +50,7 @@ strict digraph G{
 	declarator_25 -> TERMINAL_26
 	declarator_list_27 [label="declarator_list"]
 	declarator_list_27 -> declarator_25
-	declaration_28 [label="declarator_list"]
+	declaration_28 [label="declaration"]
 	TERMINAL_29 [label=";"]
 	declaration_28 -> type_specifier_23
 	declaration_28 -> declarator_list_27

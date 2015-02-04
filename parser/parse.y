@@ -891,7 +891,7 @@ declaration:
 		    $$=++node;
 		    $3=++node;
 
-		    dotfile<<"\tdeclaration_"<<$$<<" [label=\"declarator_list\"]"<<endl;
+		    dotfile<<"\tdeclaration_"<<$$<<" [label=\"declaration\"]"<<endl;
 		    dotfile<<"\tTERMINAL_"<<$3<<" [label=\";\"]"<<endl;
 		    
 		    dotfile<<"\tdeclaration_"<<$$<<" -> type_specifier_"<<$1<<endl;
