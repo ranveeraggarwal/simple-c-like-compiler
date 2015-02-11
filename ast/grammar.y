@@ -27,7 +27,7 @@
 translation_unit
 	: function_definition 
 	| translation_unit function_definition 
-        ;
+    ;
 
 function_definition
 	: type_specifier fun_declarator compound_statement 
@@ -35,13 +35,13 @@ function_definition
 
 type_specifier
 	: VOID 	
-        | INT   
+    | INT   
 	| FLOAT 
-        ;
+    ;
 
 fun_declarator
 	: IDENTIFIER '(' parameter_list ')' 
-        | IDENTIFIER '(' ')' 
+    | IDENTIFIER '(' ')' 
 	;
 
 parameter_list
@@ -51,36 +51,36 @@ parameter_list
 
 parameter_declaration
 	: type_specifier declarator 
-        ;
+    ;
 
 declarator
 	: IDENTIFIER 
 	| declarator '[' constant_expression ']' 
-        ;
+    ;
 
 constant_expression 
-        : INT_CONSTANT 
-        | FLOAT_CONSTANT 
-        ;
+    : INT_CONSTANT 
+    | FLOAT_CONSTANT 
+    ;
 
 compound_statement
 	: '{' '}' 
 	| '{' statement_list '}' 
-        | '{' declaration_list statement_list '}' 
+    | '{' declaration_list statement_list '}' 
 	;
 
 statement_list
 	: statement		
-        | statement_list statement	
+    | statement_list statement	
 	;
 
 statement
-        : '{' statement_list '}'  //a solution to the local decl problem
-        | selection_statement 	
-        | iteration_statement 	
+	: '{' statement_list '}'  //a solution to the local decl problem
+	| selection_statement 	
+	| iteration_statement 	
 	| assignment_statement	
-        | RETURN expression ';'	
-        ;
+	| RETURN expression ';'	
+	;
 
 assignment_statement
 	: ';' 								
@@ -88,26 +88,27 @@ assignment_statement
 	;
 
 expression
-        : logical_and_expression 
-        | expression OR_OP logical_and_expression
+    : logical_and_expression 
+    | expression OR_OP logical_and_expression
 	;
 
 logical_and_expression
-        : equality_expression
-        | logical_and_expression AND_OP equality_expression 
+    : equality_expression
+    | logical_and_expression AND_OP equality_expression 
 	;
 
 equality_expression
 	: relational_expression 
-        | equality_expression EQ_OP relational_expression 	
+    | equality_expression EQ_OP relational_expression 	
 	| equality_expression NE_OP relational_expression
 	;
+
 relational_expression
 	: additive_expression
-        | relational_expression '<' additive_expression 
+    | relational_expression '<' additive_expression 
 	| relational_expression '>' additive_expression 
 	| relational_expression LE_OP additive_expression 
-        | relational_expression GE_OP additive_expression 
+    | relational_expression GE_OP additive_expression 
 	;
 
 additive_expression 
@@ -121,6 +122,7 @@ multiplicative_expression
 	| multiplicative_expression '*' unary_expression 
 	| multiplicative_expression '/' unary_expression 
 	;
+
 unary_expression
 	: postfix_expression  				
 	| unary_operator postfix_expression 
@@ -135,38 +137,40 @@ postfix_expression
 
 primary_expression
 	: l_expression
-        | l_expression '=' expression // added this production
+    | l_expression '=' expression // added this production
 	| INT_CONSTANT
 	| FLOAT_CONSTANT
-        | STRING_LITERAL
+    | STRING_LITERAL
 	| '(' expression ')' 	
 	;
 
 l_expression
-        : IDENTIFIER
-        | l_expression '[' expression ']' 	
-        ;
+    : IDENTIFIER
+    | l_expression '[' expression ']' 	
+    ;
+
 expression_list
-        : expression
-        | expression_list ',' expression
-        ;
+    : expression
+    | expression_list ',' expression
+    ;
+
 unary_operator
-        : '-'	
+    : '-'	
 	| '!' 	
 	;
 
 selection_statement
-        : IF '(' expression ')' statement ELSE statement 
+    : IF '(' expression ')' statement ELSE statement 
 	;
 
 iteration_statement
 	: WHILE '(' expression ')' statement 	
-        | FOR '(' expression ';' expression ';' expression ')' statement  //modified this production
-        ;
+    | FOR '(' expression ';' expression ';' expression ')' statement  //modified this production
+    ;
 
 declaration_list
-        : declaration  					
-        | declaration_list declaration
+    : declaration  					
+    | declaration_list declaration
 	;
 
 declaration
@@ -177,7 +181,6 @@ declarator_list
 	: declarator
 	| declarator_list ',' declarator 
 	;
-
 
 /* A description of integer and float constants. Not part of the grammar.   */
 
