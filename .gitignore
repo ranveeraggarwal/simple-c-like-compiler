@@ -2,4 +2,6 @@
 *.tar.gz
 *.tgz
 notes.txt
-
+*.gv
+*.ps
+*.output

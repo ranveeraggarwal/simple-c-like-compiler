@@ -16,3 +16,9 @@ int main()
 	temp = "String literal";
 	return 0;
 }
+
+int test(){
+	int a;
+	int b;
+	a= b;
+}

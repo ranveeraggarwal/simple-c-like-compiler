@@ -13,6 +13,12 @@ translation_unit:
 		dotfile<<"\ttranslation_unit_"<<$$<<" -> function_definition_"<<$1<<endl;
 	  }
 	| translation_unit function_definition
+	{
+		$$=++node;
+		dotfile<<"\ttranslation_unit_"<<$$<<" [label=\"translation_unit\"]"<<endl;
+		dotfile<<"\ttranslation_unit_"<<$$<<" -> translation_unit_"<<$1<<endl;
+		dotfile<<"\ttranslation_unit_"<<$$<<" -> function_definition_"<<$2<<endl;
+	}
 	;
 
 function_definition:

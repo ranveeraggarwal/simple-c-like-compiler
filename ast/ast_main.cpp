@@ -6,12 +6,12 @@ using namespace std;
 class abstract_astnode
 {
 public:
-	//virtual void print () = 0;
-	//virtual std::string generate_code(const symbolTable&) = 0;
-	//virtual basic_types getType() = 0;
-	//virtual bool checkTypeofAST() = 0;
+	virtual void print () = 0;
+	virtual std::string generate_code(const symbolTable&) = 0;
+	virtual basic_types getType() = 0;
+	virtual bool checkTypeofAST() = 0;
 protected:
-	//virtual void setType(basic_types) = 0;
+	virtual void setType(basic_types) = 0;
 private:
 	//typeExp astnode_type;
 };
@@ -19,6 +19,7 @@ private:
 class expAst: public abstract_astnode
 {
 public:
+	virtual void print();
 	expAst();
 	~expAst();
 };
@@ -145,6 +146,10 @@ public:
 	stmtAst stmt;
 	while_stmt();
 	~while_stmt();
+
+	void print(){
+		cout<<
+	}
 };
 
 class for_stmt
@@ -154,7 +159,17 @@ public:
 	stmtAst stmt;
 	for_stmt();
 	~for_stmt();
+
+	void print(){
+		cout<<"(For ";
+		exp1.print();
+		exp2.print();
+		exp3.print();
+		stmt.print();
+		cout<<")"<<endl;
+	}
 };
+
 
 int main(int argc, char const *argv[])
 {
