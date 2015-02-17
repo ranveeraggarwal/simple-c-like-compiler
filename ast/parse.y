@@ -18,14 +18,18 @@
 /* ---------------------------------------------------- */
 %scanner Scanner.h
 %scanner-token-function d_scanner.lex()
+%polymorphic forAttr: for_stmt;
 
 
-%token VOID INT FLOAT FLOAT_CONSTANT INT_CONSTANT AND_OP OR_OP EQ_OP NE_OP LE_OP GE_OP STRING_LITERAL IF ELSE WHILE FOR RETURN IDENTIFIER INC_OP
+%token NOT_OP ADD_OP SUB_OP MUL_OP DIV_OP LT_OP GL_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP INC_OP STRING_LITERAL VOID INT FLOAT RETURN IF ELSE WHILE FOR IDENTIFIER FLOAT_CONSTANT INT_CONSTANT
 
 %%
 
 translation_unit
 	: function_definition 
+	{
+
+	}
 	| translation_unit function_definition 
     ;
 
@@ -89,7 +93,13 @@ assignment_statement
 
 expression
     : logical_and_expression 
+    {
+    	($$) = new expAst();
+    }
     | expression OR_OP logical_and_expression
+    {
+    	($$) = new expAst();
+    }
 	;
 
 logical_and_expression
@@ -166,6 +176,15 @@ selection_statement
 iteration_statement
 	: WHILE '(' expression ')' statement 	
     | FOR '(' expression ';' expression ';' expression ')' statement  //modified this production
+    {
+    	($$) = new for_stmt();
+    	($$).exp1 = ($3);
+    	($$).exp2 = $5; 
+    	($$).exp3 = $7;
+    	($$).stmt = $9;
+
+    	($$).print();
+    }
     ;
 
 declaration_list
