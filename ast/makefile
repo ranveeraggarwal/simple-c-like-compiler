@@ -1,7 +1,7 @@
 all: clean lex.cc parse.cc main.cc Scanner.h Scannerbase.h Scanner.ih Parser.h Parserbase.h Parser.ih
 	./sedscript
 	g++   --std=c++0x lex.cc parse.cc main.cc;
-	./a.out < testcase_1 > junk;        
+	./a.out < testcase_1 > junk.scm;        
 
 lex.cc: lex.l Scanner.ih 
 	./cond_remove_scannerih; 
@@ -16,7 +16,7 @@ parse.cc: parse.y Parser.ih Parser.h Parserbase.h
 #	./sedscript
      
 clean:
-	rm -f Parser.ih Parserbase.h Scanner* a.out lex.cc parse.cc junk
+	rm -f Parser.h Parser.ih Parserbase.h Scanner* a.out lex.cc parse.cc junk.scm
 
 Parser.ih: parse.y
 Parser.h:  parse.y

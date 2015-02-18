@@ -75,7 +75,16 @@ declarator
 
 constant_expression 
     : INT_CONSTANT
+    {
+        ($$) = new int_constant();
+        ((int_constant*)$$)->value = $1;
+
+    }
     | FLOAT_CONSTANT 
+    {
+        ($$) = new float_constant();
+        ((float_constant*)$$)->value = $1;
+    }
     ;
 
 compound_statement
@@ -102,8 +111,8 @@ statement_list
 		}
     | statement_list statement	
     	{
-    		((block_ast*)$1)->v.push_back($2);
-    		$$ = $1;
+            $$ = $1;
+    		((block_ast*)$$)->v.push_back($2);
     	}
 	;
 
@@ -130,7 +139,7 @@ statement
 	| RETURN expression ';'	
 	{
 		$$ = new return_stmt();
-		((return_stmt*)$$)->exp = ($<ExpAst>1);
+		((return_stmt*)$$)->exp = ($<ExpAst>2);
 		
 	}
 	;
@@ -157,9 +166,10 @@ expression
     }
     | expression OR_OP logical_and_expression
     {
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "||";
     	((op*)$$)->optype = 1;
     }
@@ -172,9 +182,10 @@ logical_and_expression
     }
     | logical_and_expression AND_OP equality_expression 
     {
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "&&";
     	((op*)$$)->optype = 1;
     }
@@ -187,17 +198,19 @@ equality_expression
     }
     | equality_expression EQ_OP relational_expression 	
     {
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "==";
     	((op*)$$)->optype = 1;
     }
 	| equality_expression NE_OP relational_expression
 	{
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "!=";
     	((op*)$$)->optype = 1;
     }
@@ -210,34 +223,38 @@ relational_expression
     }
     | relational_expression '<' additive_expression 
     {
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
-    	((op*)$$)->opcode = ">";
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
+    	((op*)$$)->opcode = "<";
     	((op*)$$)->optype = 1;
     }
 	| relational_expression '>' additive_expression 
 	{
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
-    	((op*)$$)->opcode = "<";
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
+    	((op*)$$)->opcode = ">";
     	((op*)$$)->optype = 1;
     }
 	| relational_expression LE_OP additive_expression 
 	{
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "<=";
     	((op*)$$)->optype = 1;
     }
     | relational_expression GE_OP additive_expression 
     {
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
-    	((op*)$$)->opcode = "<=";
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
+    	((op*)$$)->opcode = ">=";
     	((op*)$$)->optype = 1;
     }
 	;
@@ -249,18 +266,20 @@ additive_expression
     }
 	| additive_expression '+' multiplicative_expression
 	{
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "+";
     	((op*)$$)->optype = 1;
     } 
 	| additive_expression '-' multiplicative_expression 
 	{
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
-    	((op*)$$)->opcode = "+";
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
+    	((op*)$$)->opcode = "-";
     	((op*)$$)->optype = 1;
     }
 	;
@@ -272,17 +291,19 @@ multiplicative_expression
     }
 	| multiplicative_expression '*' unary_expression 
 	{
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "*";
     	((op*)$$)->optype = 1;
     }
 	| multiplicative_expression '/' unary_expression 
 	{
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "/";
     	((op*)$$)->optype = 1;
     }
@@ -295,9 +316,10 @@ unary_expression
     }				
 	| unary_operator postfix_expression 
 	{
+        //String* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = ($2);
-    	((op*)$$)->opcode = ($<String>1);
+    	((op*)$$)->opcode = $<String>1;
     	((op*)$$)->optype = 0;
     }
 	;
@@ -314,13 +336,14 @@ postfix_expression
 	    }
 	| IDENTIFIER '(' expression_list ')' 
 		{
-			((fun_call*)$3)->fun_name = $1;
+			((fun_call*)$$)->fun_name = $1;
 			$$=$3;
 		}
 	| l_expression INC_OP
 	{
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp1 = temp;
     	((op*)$$)->opcode = "++";
     	((op*)$$)->optype = 0;
     }
@@ -333,9 +356,10 @@ primary_expression
     }
     | l_expression '=' expression // added this production
     {
+        expAst* temp = $1;
     	($$) = new op();
-    	((op*)$$)->exp1 = ($<ExpAst>1);
-    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->exp1 = temp;
+    	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "=";
     	((op*)$$)->optype = 1;
     }
@@ -362,15 +386,15 @@ primary_expression
 
 l_expression
     : IDENTIFIER
-    {
-    	$$ = new identifier();
+    {   
+        $$ = new identifier();
     	((identifier*)$$)->value = $1;
     }
     | l_expression '[' expression ']'
     {
     	$$ = new index();
     	((index*)$$)->arr = ((arrayRef*)$<ExpAst>1);
-    	((index*)$$)->exp = $<ExpAst>3;
+    	((index*)$$)->exp = ($<ExpAst>3);
     }
     ;
 
@@ -418,11 +442,13 @@ iteration_statement
     }
     | FOR '(' expression ';' expression ';' expression ')' statement
     {
+        //cout<<"ok"<<$3<<" "<<endl;
     	($$) = new for_stmt();
     	((for_stmt*)$$)->exp1 = ($3);
     	((for_stmt*)$$)->exp2 = ($5); 
     	((for_stmt*)$$)->exp3 = ($7);
     	((for_stmt*)$$)->stmt = ($9);
+
     }
     ;
 

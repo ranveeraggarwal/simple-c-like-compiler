@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <typeinfo>
 using namespace std;
 
 class abstract_astnode
@@ -55,7 +56,14 @@ public:
 		{
 			cout << "(" << opcode << " ";
 			exp1->print();
-			cout << ")" << endl;
+			cout << ")";
+		}
+		else{
+			cout<<"( "<<opcode<<" ";
+
+			exp1->print();
+			exp2->print();
+			cout<<" )";
 		}	
 	}
 };
@@ -96,7 +104,7 @@ public:
 			cout << " ";
 			v[i]->print();
 		}
-		cout << ")" << endl;
+		cout << ")";
 	}
 };
 
@@ -111,7 +119,7 @@ public:
 	{
 		cout << "(FloatConst \"";
 		cout << value;
-		cout << "\")" << endl;
+		cout << "\")";
 	}
 };
 
@@ -126,7 +134,7 @@ public:
 	{
 		cout << "(IntConst \"";
 		cout << value;
-		cout << "\")" << endl;
+		cout << "\")" ;
 	}
 };
 
@@ -141,7 +149,7 @@ public:
 	{
 		cout << "(StringCont \"";
 		cout << value;
-		cout << "\")" << endl;
+		cout << "\")";
 	}
 };
 
@@ -156,7 +164,7 @@ public:
 	{
 		cout << "(Id \"";
 		cout << value;
-		cout << "\")" << endl;
+		cout << "\")";
 	}
 };
 
@@ -171,7 +179,7 @@ public:
 	{
 		cout << "(Id \"";
 		cout << value;
-		cout << "\")" << endl;
+		cout << "\")";
 	}
 };
 
@@ -190,7 +198,7 @@ public:
 		cout << "[";
 		exp->print();
 		cout << "]";
-		cout << ")" << endl;
+		cout << ")";
 	}
 };
 
@@ -226,7 +234,7 @@ public:
 			cout << "(Ass ";
 			exp1->print();
 			exp2->print();
-			cout << ")" << endl;
+			cout << ")";
 		}
 	}
 };
@@ -258,7 +266,9 @@ public:
 	{
 		cout << "(If ";
 		exp->print();
+		cout<<endl;
 		stmt1->print();
+		cout<<endl;
 		stmt2->print();
 		cout << ")";
 	}
@@ -275,8 +285,9 @@ public:
 	void print(){
 		cout << "(While ";
 		exp->print();
+		cout<<endl;
 		stmt->print();
-		cout << ")" << endl;
+		cout << ")";
 	}
 };
 
@@ -291,10 +302,13 @@ public:
 	void print(){
 		cout << "(For ";
 		exp1->print();
+		cout<<endl;
 		exp2->print();
+		cout<<endl;
 		exp3->print();
+		cout<<endl;
 		stmt->print();
-		cout << ")" << endl;
+		cout << ")";
 	}
 };
 
