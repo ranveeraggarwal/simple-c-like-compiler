@@ -84,7 +84,7 @@ statement_list
 	;
 
 statement
-	: '{' statement_list '}'  //a solution to the local decl problem
+	: '{' statement_list '}'
 	| selection_statement 	
 	| iteration_statement 	
 	| assignment_statement	
@@ -176,6 +176,13 @@ unary_operator
 
 selection_statement
     : IF '(' expression ')' statement ELSE statement 
+    {
+    	($<StmAst>$) = new if_stmt();
+    	($<StmAst>$)->exp = ($<ExpAst>3);
+    	($<StmAst>$)->stmt1 = ($<ExpAst>5);
+    	($<StmAst>$)->stmt2 = ($<ExpAst>7);
+    	($<StmAst>$)->print();
+    }
 	;
 
 iteration_statement
@@ -192,7 +199,7 @@ iteration_statement
     	($<StmAst>$)->exp1 = ($<ExpAst>3);
     	($<StmAst>$)->exp2 = ($<ExpAst>5); 
     	($<StmAst>$)->exp3 = ($<ExpAst>7);
-    	($<StmAst>$)->stmt = ($<ExpAst>8);
+    	($<StmAst>$)->stmt = ($<ExpAst>9);
     	($<StmAst>$)->print();
     }
     ;
