@@ -218,7 +218,7 @@ public:
 	}
 };
 
-class if_stmt
+class if_stmt: public stmtAst
 {
 public:
 	expAst exp;
@@ -236,7 +236,7 @@ public:
 	}
 };
 
-class while_stmt
+class while_stmt: public stmtAst
 {
 public:
 	expAst exp;
@@ -252,20 +252,20 @@ public:
 	}
 };
 
-class for_stmt
+class for_stmt: public stmtAst
 {
 public:
-	expAst exp1, exp2, exp3;
-	stmtAst stmt;
+	expAst *exp1, *exp2, *exp3;
+	stmtAst *stmt;
 	for_stmt();
 	~for_stmt();
 
 	void print(){
 		cout << "(For ";
-		exp1.print();
-		exp2.print();
-		exp3.print();
-		stmt.print();
+		exp1->print();
+		exp2->print();
+		exp3->print();
+		stmt->print();
 		cout << ")" << endl;
 	}
 };

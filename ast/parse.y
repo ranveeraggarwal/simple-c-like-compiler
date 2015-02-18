@@ -18,10 +18,15 @@
 /* ---------------------------------------------------- */
 %scanner Scanner.h
 %scanner-token-function d_scanner.lex()
-%polymorphic forAttr: for_stmt;
+%polymorphic ExpAst : expAst* ; StmAst : stmtAst*; Int : int_constant; Float : float_constant; String : string_constant;
 
+%type <ExpAst> expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression postfix_expression primary_expression l_expression constant_expression expression_list unary_operator
+%type <StmAst> selection_statement iteration_statement assignment_statement translation_unit function_definition compound_statement statement statement_list
+%type <Int> INT_CONSTANT
+%type <Float> FLOAT_CONSTANT
+%type <String> STRING_LITERAL IDENTIFIER
 
-%token NOT_OP ADD_OP SUB_OP MUL_OP DIV_OP LT_OP GL_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP INC_OP STRING_LITERAL VOID INT FLOAT RETURN IF ELSE WHILE FOR IDENTIFIER FLOAT_CONSTANT INT_CONSTANT
+%token NOT_OP ADD_OP SUB_OP MUL_OP DIV_OP LT_OP GL_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP INC_OP VOID INT FLOAT RETURN IF ELSE WHILE FOR 
 
 %%
 
@@ -175,15 +180,15 @@ selection_statement
 
 iteration_statement
 	: WHILE '(' expression ')' statement 	
-    | FOR '(' expression ';' expression ';' expression ')' statement  //modified this production
+    | FOR '(' expression ';' expression ';' expression ')' statement
     {
-    	($$) = new for_stmt();
-    	($$).exp1 = ($3);
-    	($$).exp2 = $5; 
-    	($$).exp3 = $7;
-    	($$).stmt = $9;
+    	($<StmAst>$) = new for_stmt();
+    	((for_stmt*)$<StmAst>$)->exp1 = ($<ExpAst>3);
+    	((for_stmt*)$<StmAst>$)->exp2 = $5; 
+    	((for_stmt*)$<StmAst>$)->exp3 = $7;
+    	((for_stmt*)$<StmAst>$)->stmt = $9;
 
-    	($$).print();
+    	((for_stmt*)$<StmAst>$)->print();
     }
     ;
 
