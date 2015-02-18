@@ -19,25 +19,25 @@ private:
 class expAst: public abstract_astnode
 {
 public:
-	virtual void print();
-	expAst();
-	~expAst();
+	virtual void print() = 0;
+	expAst(){}
+	
 };
 
-class arrayRef: public abstract_astnode
+class arrayRef: public expAst
 {
 public:
-	virtual void print();
-	arrayRef();
-	~arrayRef();
+	virtual void print() = 0;
+	arrayRef(){}
+	
 };
 
 class stmtAst: public abstract_astnode
 {
 public:
-	virtual void print();
-	stmtAst();
-	~stmtAst();
+	virtual void print() = 0;
+	stmtAst(){}
+	
 };
 
 class op: public expAst
@@ -46,8 +46,8 @@ public:
 	expAst *exp1, *exp2;
 	string opcode;
 	bool optype;
-	op();
-	~op();
+	op(){}
+	
 
 	void print()
 	{
@@ -60,16 +60,37 @@ public:
 	}
 };
 
-class fun_call: public expAst
+class block_ast: public stmtAst
 {
 public:
-	std::vector<expAst*> v;
-	fun_call();
-	~fun_call();
+	std::vector<stmtAst*> v;
+	block_ast(){}
+	
 
 	void print()
 	{
-		cout << "(FunCall";
+		cout << "(Block[";
+		for (int i = 0; i < v.size(); i++)
+		{
+			cout << " ";
+			v[i]->print();
+			if (i != v.size()-1)cout << endl;
+		}
+		cout << "])";
+	}
+};
+
+class fun_call: public expAst
+{
+public:
+	string fun_name;
+	std::vector<expAst*> v;
+	fun_call(){}
+	
+
+	void print()
+	{
+		cout << fun_name;
 		for (int i = 0; i < v.size(); i++)
 		{
 			cout << " ";
@@ -83,8 +104,8 @@ class float_constant: public expAst
 {
 public:
 	float value;
-	float_constant();
-	~float_constant();
+	float_constant(){}
+	
 
 	void print()
 	{
@@ -98,8 +119,8 @@ class int_constant: public expAst
 {
 public:
 	int value;
-	int_constant();
-	~int_constant();
+	int_constant(){}
+	
 
 	void print()
 	{
@@ -113,8 +134,8 @@ class string_constant: public expAst
 {
 public:
 	string value;
-	string_constant();
-	~string_constant();
+	string_constant(){}
+	
 
 	void print()
 	{
@@ -128,8 +149,8 @@ class identifier_exp: public expAst
 {
 public:
 	string value;
-	identifier_exp();
-	~identifier_exp();
+	identifier_exp(){}
+	
 
 	void print()
 	{
@@ -143,8 +164,8 @@ class identifier: public arrayRef
 {
 public:
 	string value;
-	identifier();
-	~identifier();
+	identifier(){}
+	
 
 	void print()
 	{
@@ -159,8 +180,8 @@ class index: public arrayRef
 public:
 	arrayRef *arr;
 	expAst *exp;
-	index();
-	~index();
+	index(){}
+	
 
 	void print()
 	{
@@ -177,8 +198,8 @@ class seq: public stmtAst
 {
 public:
 	stmtAst *stmt1, *stmt2;
-	seq();
-	~seq();
+	seq(){}
+	
 
 	void print()
 	{
@@ -191,15 +212,22 @@ class ass: public stmtAst
 {
 public:
 	expAst *exp1, *exp2;
-	ass();
-	~ass();
+	ass(){}
+	
 
 	void print()
 	{
-		cout << "(Ass ";
-		exp1->print();
-		exp2->print();
-		cout << ")" << endl;
+		if (exp1 == 0 && exp2==0)
+		{
+			cout << "(Empty)";
+		}
+		else
+		{
+			cout << "(Ass ";
+			exp1->print();
+			exp2->print();
+			cout << ")" << endl;
+		}
 	}
 };
 
@@ -207,8 +235,8 @@ class return_stmt: public stmtAst
 {
 public:
 	expAst *exp;
-	return_stmt();
-	~return_stmt();
+	return_stmt(){}
+	
 
 	void print()
 	{
@@ -223,8 +251,8 @@ class if_stmt: public stmtAst
 public:
 	expAst *exp;
 	stmtAst *stmt1, *stmt2;
-	if_stmt();
-	~if_stmt();
+	if_stmt(){}
+	
 
 	void print()
 	{
@@ -241,8 +269,8 @@ class while_stmt: public stmtAst
 public:
 	expAst *exp;
 	stmtAst *stmt;
-	while_stmt();
-	~while_stmt();
+	while_stmt(){}
+	
 
 	void print(){
 		cout << "(While ";
@@ -257,8 +285,8 @@ class for_stmt: public stmtAst
 public:
 	expAst *exp1, *exp2, *exp3;
 	stmtAst *stmt;
-	for_stmt();
-	~for_stmt();
+	for_stmt(){}
+	
 
 	void print(){
 		cout << "(For ";

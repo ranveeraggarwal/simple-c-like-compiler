@@ -1,9 +1,7 @@
-all:    lex.cc parse.cc main.cc Scanner.h Scannerbase.h Scanner.ih Parser.h Parserbase.h Parser.ih
-	#./sedscript
+all: clean lex.cc parse.cc main.cc Scanner.h Scannerbase.h Scanner.ih Parser.h Parserbase.h Parser.ih
+	./sedscript
 	g++   --std=c++0x lex.cc parse.cc main.cc;
-	./a.out < testcase_1 > junk;
-	egrep 'nextToken|reduce' junk
-        
+	./a.out < testcase_1 > junk;        
 
 lex.cc: lex.l Scanner.ih 
 	./cond_remove_scannerih; 
@@ -11,7 +9,7 @@ lex.cc: lex.l Scanner.ih
 	sed -i '/include/a #include "Parserbase.h"' Scanner.ih; 
 
 parse.cc: parse.y Parser.ih Parser.h Parserbase.h
-	bisonc++  parse.y; 
+	bisonc++ parse.y; 
 #	bisonc++   --construction -V parse.y; 
 #	sed -i '/ifndef/a #include "tree_util.hh"' Parserbase.h;
 #	sed -i '/ifndef/a #include "tree.hh"' Parserbase.h;

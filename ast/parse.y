@@ -16,15 +16,17 @@
 /* start symbol is translation_unit */
 
 /* ---------------------------------------------------- */
+
+//%debug
 %scanner Scanner.h
 %scanner-token-function d_scanner.lex()
-%polymorphic ExpAst : expAst* ; StmAst : stmtAst*; Int : int_constant; Float : float_constant; String : string_constant;
+%polymorphic ExpAst : expAst* ; StmAst : stmtAst*; Int : int; Float : float; String : string;
 
-%type <ExpAst> expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression postfix_expression primary_expression l_expression constant_expression expression_list unary_operator
+%type <ExpAst> expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression postfix_expression primary_expression l_expression constant_expression expression_list 
 %type <StmAst> selection_statement iteration_statement assignment_statement translation_unit function_definition compound_statement statement statement_list
 %type <Int> INT_CONSTANT
 %type <Float> FLOAT_CONSTANT
-%type <String> STRING_LITERAL IDENTIFIER
+%type <String> STRING_LITERAL IDENTIFIER unary_operator
 
 %token NOT_OP ADD_OP SUB_OP MUL_OP DIV_OP LT_OP GL_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP INC_OP VOID INT FLOAT RETURN IF ELSE WHILE FOR 
 
@@ -33,13 +35,17 @@
 translation_unit
 	: function_definition 
 	{
-
+		$$ = $1;
+		$$->print();
 	}
 	| translation_unit function_definition 
     ;
 
 function_definition
 	: type_specifier fun_declarator compound_statement 
+		{
+			$$ = $3;
+		}
 	;
 
 type_specifier
@@ -68,280 +74,355 @@ declarator
     ;
 
 constant_expression 
-    : INT_CONSTANT 
+    : INT_CONSTANT
     | FLOAT_CONSTANT 
     ;
 
 compound_statement
 	: '{' '}' 
+		{
+			$$ = new block_ast();
+		}
 	| '{' statement_list '}' 
+		{
+			$$ = $2;
+		}
     | '{' declaration_list statement_list '}' 
+    	{
+    		$$ = $3;
+    	}
 	;
 
 statement_list
 	: statement		
+		{
+			stmtAst* temp = $1;
+			$$ = new block_ast();
+			((block_ast*)$$)->v.push_back(temp);
+		}
     | statement_list statement	
+    	{
+    		((block_ast*)$1)->v.push_back($2);
+    		$$ = $1;
+    	}
 	;
 
 statement
 	: '{' statement_list '}'
 	{
-
+		$$ = $2;
 	}
 	| selection_statement 	
+	{
+		$$ = $1;
+		
+	}
 	| iteration_statement 	
+	{
+		$$ = $1;
+		
+	}
 	| assignment_statement	
+	{
+		$$ = $1;
+		
+	}
 	| RETURN expression ';'	
+	{
+		$$ = new return_stmt();
+		((return_stmt*)$$)->exp = ($<ExpAst>1);
+		
+	}
 	;
 
 assignment_statement
-	: ';' 								
-	|  l_expression '=' expression ';'	
+	: ';'
+	{
+		$$ = new ass();
+		((ass*)$$)->exp1 = 0;
+		((ass*)$$)->exp2 = 0;
+	} 								
+	|  l_expression '=' expression ';'
+	{
+		$$ = new ass();
+		((ass*)$$)->exp1 = $1;
+		((ass*)$$)->exp2 = $3;
+	}	
 	;
 
 expression
     : logical_and_expression 
     {
-    	($<ExpAst>$) = new expAst();
-    	($<ExpAst>$) = ($<ExpAst>1);
+    	($$) = ($1);
     }
     | expression OR_OP logical_and_expression
     {
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "||";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "||";
+    	((op*)$$)->optype = 1;
     }
 	;
 
 logical_and_expression
     : equality_expression
     {
-    	($<ExpAst>$) = new expAst();
-    	($<ExpAst>$) = ($<ExpAst>1);
+    	($$) = ($1);
     }
     | logical_and_expression AND_OP equality_expression 
     {
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "&&";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "&&";
+    	((op*)$$)->optype = 1;
     }
 	;
 
 equality_expression
 	: relational_expression 
 	{
-    	($<ExpAst>$) = new expAst();
-    	($<ExpAst>$) = ($<ExpAst>1);
+    	($$) = ($1);
     }
     | equality_expression EQ_OP relational_expression 	
     {
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "==";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "==";
+    	((op*)$$)->optype = 1;
     }
 	| equality_expression NE_OP relational_expression
 	{
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "!=";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "!=";
+    	((op*)$$)->optype = 1;
     }
 	;
 
 relational_expression
 	: additive_expression
 	{
-    	($<ExpAst>$) = new expAst();
-    	($<ExpAst>$) = ($<ExpAst>1);
+    	($$) = ($1);
     }
     | relational_expression '<' additive_expression 
     {
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = ">";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = ">";
+    	((op*)$$)->optype = 1;
     }
 	| relational_expression '>' additive_expression 
 	{
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "<";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "<";
+    	((op*)$$)->optype = 1;
     }
 	| relational_expression LE_OP additive_expression 
 	{
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "<=";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "<=";
+    	((op*)$$)->optype = 1;
     }
     | relational_expression GE_OP additive_expression 
     {
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "<=";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "<=";
+    	((op*)$$)->optype = 1;
     }
 	;
 
 additive_expression 
 	: multiplicative_expression
 	{
-    	($<ExpAst>$) = new expAst();
-    	($<ExpAst>$) = ($<ExpAst>1);
+    	($$) = ($1);
     }
 	| additive_expression '+' multiplicative_expression
 	{
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "+";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "+";
+    	((op*)$$)->optype = 1;
     } 
 	| additive_expression '-' multiplicative_expression 
 	{
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "+";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "+";
+    	((op*)$$)->optype = 1;
     }
 	;
 
 multiplicative_expression
 	: unary_expression
 	{
-    	($<ExpAst>$) = new expAst();
-    	($<ExpAst>$) = ($<ExpAst>1);
+    	($$) = ($1);
     }
 	| multiplicative_expression '*' unary_expression 
 	{
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "*";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "*";
+    	((op*)$$)->optype = 1;
     }
 	| multiplicative_expression '/' unary_expression 
 	{
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "/";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "/";
+    	((op*)$$)->optype = 1;
     }
 	;
 
 unary_expression
 	: postfix_expression  
 	{
-    	($<ExpAst>$) = new expAst();
-    	($<ExpAst>$) = ($<ExpAst>1);
+    	($$) = ($1);
     }				
 	| unary_operator postfix_expression 
 	{
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = $1;
-    	($<ExpAst>$)->optype = 0;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($2);
+    	((op*)$$)->opcode = ($<String>1);
+    	((op*)$$)->optype = 0;
     }
 	;
 
 postfix_expression
 	: primary_expression
 	{
-    	($<ExpAst>$) = new expAst();
-    	($<ExpAst>$) = ($<ExpAst>1);
+    	($$) = ($1);
     }
     | IDENTIFIER '(' ')'
-
+	    {
+	    	$$ = new fun_call();
+	    	((fun_call*)$$)->fun_name = $1;
+	    }
 	| IDENTIFIER '(' expression_list ')' 
+		{
+			((fun_call*)$3)->fun_name = $1;
+			$$=$3;
+		}
 	| l_expression INC_OP
 	{
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->opcode = "++";
-    	($<ExpAst>$)->optype = 0;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->opcode = "++";
+    	((op*)$$)->optype = 0;
     }
 	;
 
 primary_expression
 	: l_expression
 	{
-    	($<ExpAst>$) = new expAst();
-    	($<ExpAst>$) = ($<ExpAst>1);
+    	($$) = ($1);
     }
     | l_expression '=' expression // added this production
     {
-    	($<ExpAst>$) = new op();
-    	($<ExpAst>$)->exp1 = ($<ExpAst>1);
-    	($<ExpAst>$)->exp2 = ($<ExpAst>2);
-    	($<ExpAst>$)->opcode = "=";
-    	($<ExpAst>$)->optype = 1;
+    	($$) = new op();
+    	((op*)$$)->exp1 = ($<ExpAst>1);
+    	((op*)$$)->exp2 = ($<ExpAst>2);
+    	((op*)$$)->opcode = "=";
+    	((op*)$$)->optype = 1;
     }
 	| INT_CONSTANT
 	{
-    	($<ExpAst>$) = new int_constant();
-    	($<ExpAst>$).value = $1;
+    	($$) = new int_constant();
+    	((int_constant*)$$)->value = $1;
     }
 	| FLOAT_CONSTANT
+		{
+    	($$) = new float_constant();
+    	((float_constant*)$$)->value = $1;
+    	}	
     | STRING_LITERAL
-	| '(' expression ')' 	
+    {
+    	($$) = new string_constant();
+    	((string_constant*)$$)->value = $1;
+    }
+	| '(' expression ')'
+	{
+		$$ = $2;
+	}	
 	;
 
 l_expression
     : IDENTIFIER
-    | l_expression '[' expression ']' 	
+    {
+    	$$ = new identifier();
+    	((identifier*)$$)->value = $1;
+    }
+    | l_expression '[' expression ']'
+    {
+    	$$ = new index();
+    	((index*)$$)->arr = ((arrayRef*)$<ExpAst>1);
+    	((index*)$$)->exp = $<ExpAst>3;
+    }
     ;
 
 expression_list
     : expression
+    	{
+    		expAst *temp = $1;
+    		$$ = new fun_call();
+    		((fun_call*)$$)->v.push_back(temp);
+    	}
     | expression_list ',' expression
+	    {
+	    	$$ = $1;
+	    	((fun_call*)$$)->v.push_back($3);
+	    }
     ;
 
 unary_operator
-    : '-'	
-	| '!' 	
+    : '-'
+    	{
+    		$$ = "-";
+    	}	
+	| '!'
+		{
+    		$$ = "!";
+    	}	
 	;
 
 selection_statement
     : IF '(' expression ')' statement ELSE statement 
     {
-    	($<StmAst>$) = new if_stmt();
-    	($<StmAst>$)->exp = ($<ExpAst>3);
-    	($<StmAst>$)->stmt1 = ($<ExpAst>5);
-    	($<StmAst>$)->stmt2 = ($<ExpAst>7);
-    	($<StmAst>$)->print();
+    	($$) = new if_stmt();
+    	((if_stmt*)$$)->exp = ($3);
+    	((if_stmt*)$$)->stmt1 = ($5);
+    	((if_stmt*)$$)->stmt2 = ($7);
     }
 	;
 
 iteration_statement
 	: WHILE '(' expression ')' statement
 	{
-    	($<StmAst>$) = new while_stmt();
-    	($<StmAst>$)->exp = ($<ExpAst>3);
-    	($<StmAst>$)->stmt = ($<ExpAst>5);
-    	($<StmAst>$)->print();
+    	($$) = new while_stmt();
+    	((while_stmt*)$$)->exp = ($3);
+    	((while_stmt*)$$)->stmt = ($5);
     }
     | FOR '(' expression ';' expression ';' expression ')' statement
     {
-    	($<StmAst>$) = new for_stmt();
-    	($<StmAst>$)->exp1 = ($<ExpAst>3);
-    	($<StmAst>$)->exp2 = ($<ExpAst>5); 
-    	($<StmAst>$)->exp3 = ($<ExpAst>7);
-    	($<StmAst>$)->stmt = ($<ExpAst>9);
-    	($<StmAst>$)->print();
+    	($$) = new for_stmt();
+    	((for_stmt*)$$)->exp1 = ($3);
+    	((for_stmt*)$$)->exp2 = ($5); 
+    	((for_stmt*)$$)->exp3 = ($7);
+    	((for_stmt*)$$)->stmt = ($9);
     }
     ;
 
@@ -358,54 +439,3 @@ declarator_list
 	: declarator
 	| declarator_list ',' declarator 
 	;
-
-/* A description of integer and float constants. Not part of the grammar.   */
-
-/* Numeric constants are defined as:  */
-
-/* C-constant: */
-/*   C-integer-constant */
-/*   floating-point-constant */
- 
-/* C-integer-constant: */
-/*   [1-9][0-9]* */
-/*   0[bB][01]* */
-/*   0[0-7]* */
-/*   0[xX][0-9a-fA-F]* */
- 
-/* floating-point-constant: */
-/*   integer-part.[fractional-part ][exponent-part ] */
-
-/* integer-part: */
-/*   [0-9]* */
- 
-/* fractional-part: */
-/*   [0-9]* */
- 
-/* exponent-part: */
-/*   [eE][+-][0-9]* */
-/*   [eE][0-9]* */
-
-/* The rule given above is not entirely accurate. Correct it on the basis of the following examples: */
-
-/* 1. */
-/* 23.1 */
-/* 01.456 */
-/* 12.e45 */
-/* 12.45e12 */
-/* 12.45e-12 */
-/* 12.45e+12 */
-
-/* The following are not examples of FLOAT_CONSTANTs: */
-
-/* 234 */
-/* . */
-
-/* We have not yet defined STRING_LITERALs. For our purpose, these are */
-/* sequence of characters enclosed within a pair of ". If the enclosed */
-/* sequence contains \ and ", they must be preceded with a \. Apart from */
-/* \and ", the only other character that can follow a \ within a string */
-/* are t and n.  */
-
-
-

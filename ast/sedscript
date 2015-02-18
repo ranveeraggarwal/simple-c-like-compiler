@@ -5,8 +5,11 @@ sed -i '/insert preincludes/a #include "ast_main.cpp"' Parserbase.h;
 sed -i '\|STYPE__     d_val__;| d 
 ' Parserbase.h
 
-sed -i '\|typedef Meta__::SType STYPE__;|a \\tpublic: static STYPE__  d_val__;
+sed -i '\|typedef Meta__::SType STYPE__;| a \\tpublic: static STYPE__  d_val__;
 ' Parserbase.h 
+
+sed -i '\|void Parser::print__()| i Meta__::SType ParserBase::d_val__;
+' parse.cc
 
 
 

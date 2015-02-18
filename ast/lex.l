@@ -64,7 +64,8 @@ OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 {NE_OP}														return Parser::NE_OP;
 {AND_OP}													return Parser::AND_OP;
 {OR_OP}														return Parser::OR_OP;
-{STRING_LITERAL}											return Parser::STRING_LITERAL;
+{STRING_LITERAL}											{Parser::d_val__ = std::string(matched());
+															return Parser::STRING_LITERAL;}
 {void}														return Parser::VOID;
 {int}														return Parser::INT;
 {float}														return Parser::FLOAT;
@@ -73,7 +74,16 @@ OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 {else}														return Parser::ELSE;
 {while}														return Parser::WHILE;
 {for}														return Parser::FOR;
-{identifiers}												return Parser::IDENTIFIER;
-{float_constant}											return Parser::FLOAT_CONSTANT;
-{int_constant}												return Parser::INT_CONSTANT;
+{identifiers}												{Parser::d_val__ = std::string(matched());
+															return Parser::IDENTIFIER;}
+{float_constant}											{
+															float v;
+															istringstream(std::string(matched()))>>v;
+															Parser::d_val__ = v;
+															return Parser::FLOAT_CONSTANT;}
+{int_constant}												{
+															int v;
+															istringstream(std::string(matched()))>>v;
+															Parser::d_val__ = v;
+															return Parser::INT_CONSTANT;}
 .															return matched()[0];
