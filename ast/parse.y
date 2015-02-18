@@ -179,16 +179,21 @@ selection_statement
 	;
 
 iteration_statement
-	: WHILE '(' expression ')' statement 	
+	: WHILE '(' expression ')' statement
+	{
+    	($<StmAst>$) = new while_stmt();
+    	($<StmAst>$)->exp = ($<ExpAst>3);
+    	($<StmAst>$)->stmt = ($<ExpAst>5);
+    	($<StmAst>$)->print();
+    }
     | FOR '(' expression ';' expression ';' expression ')' statement
     {
     	($<StmAst>$) = new for_stmt();
-    	((for_stmt*)$<StmAst>$)->exp1 = ($<ExpAst>3);
-    	((for_stmt*)$<StmAst>$)->exp2 = $5; 
-    	((for_stmt*)$<StmAst>$)->exp3 = $7;
-    	((for_stmt*)$<StmAst>$)->stmt = $9;
-
-    	((for_stmt*)$<StmAst>$)->print();
+    	($<StmAst>$)->exp1 = ($<ExpAst>3);
+    	($<StmAst>$)->exp2 = ($<ExpAst>5); 
+    	($<StmAst>$)->exp3 = ($<ExpAst>7);
+    	($<StmAst>$)->stmt = ($<ExpAst>8);
+    	($<StmAst>$)->print();
     }
     ;
 

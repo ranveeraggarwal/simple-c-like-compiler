@@ -43,7 +43,7 @@ public:
 class op: public expAst
 {
 public:
-	expAst exp1, exp2;
+	expAst *exp1, *exp2;
 	string opcode;
 	bool optype;
 	op();
@@ -54,7 +54,7 @@ public:
 		if (!optype)
 		{
 			cout << "(" << opcode << " ";
-			exp1.print();
+			exp1->print();
 			cout << ")" << endl;
 		}	
 	}
@@ -63,7 +63,7 @@ public:
 class fun_call: public expAst
 {
 public:
-	std::vector<expAst> v;
+	std::vector<expAst*> v;
 	fun_call();
 	~fun_call();
 
@@ -73,7 +73,7 @@ public:
 		for (int i = 0; i < v.size(); i++)
 		{
 			cout << " ";
-			v[i].print();
+			v[i]->print();
 		}
 		cout << ")" << endl;
 	}
@@ -157,17 +157,17 @@ public:
 class index: public arrayRef
 {
 public:
-	arrayRef arr;
-	expAst exp;
+	arrayRef *arr;
+	expAst *exp;
 	index();
 	~index();
 
 	void print()
 	{
 		cout << "(Ref ";
-		arr.print();
+		arr->print();
 		cout << "[";
-		exp.print();
+		exp->print();
 		cout << "]";
 		cout << ")" << endl;
 	}
@@ -176,29 +176,29 @@ public:
 class seq: public stmtAst
 {
 public:
-	stmtAst stmt1, stmt2;
+	stmtAst *stmt1, *stmt2;
 	seq();
 	~seq();
 
 	void print()
 	{
-		stmt1.print();
-		stmt2.print();
+		stmt1->print();
+		stmt2->print();
 	}
 };
 
 class ass: public stmtAst
 {
 public:
-	expAst exp1, exp2;
+	expAst *exp1, *exp2;
 	ass();
 	~ass();
 
 	void print()
 	{
 		cout << "(Ass ";
-		exp1.print();
-		exp2.print();
+		exp1->print();
+		exp2->print();
 		cout << ")" << endl;
 	}
 };
@@ -206,14 +206,14 @@ public:
 class return_stmt: public stmtAst
 {
 public:
-	expAst exp;
+	expAst *exp;
 	return_stmt();
 	~return_stmt();
 
 	void print()
 	{
 		cout << "(Return ";
-		exp.print();
+		exp->print();
 		cout << ")";
 	}
 };
@@ -221,17 +221,17 @@ public:
 class if_stmt: public stmtAst
 {
 public:
-	expAst exp;
-	stmtAst stmt1, stmt2;
+	expAst *exp;
+	stmtAst *stmt1, *stmt2;
 	if_stmt();
 	~if_stmt();
 
 	void print()
 	{
 		cout << "(If ";
-		exp.print();
-		stmt1.print();
-		stmt2.print();
+		exp->print();
+		stmt1->print();
+		stmt2->print();
 		cout << ")";
 	}
 };
@@ -239,15 +239,15 @@ public:
 class while_stmt: public stmtAst
 {
 public:
-	expAst exp;
-	stmtAst stmt;
+	expAst *exp;
+	stmtAst *stmt;
 	while_stmt();
 	~while_stmt();
 
 	void print(){
 		cout << "(While ";
-		exp.print();
-		stmt.print();
+		exp->print();
+		stmt->print();
 		cout << ")" << endl;
 	}
 };

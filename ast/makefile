@@ -1,5 +1,5 @@
 all:    lex.cc parse.cc main.cc Scanner.h Scannerbase.h Scanner.ih Parser.h Parserbase.h Parser.ih
-	./sedscript
+	#./sedscript
 	g++   --std=c++0x lex.cc parse.cc main.cc;
 	./a.out < testcase_1 > junk;
 	egrep 'nextToken|reduce' junk
