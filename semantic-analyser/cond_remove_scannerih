@@ -1,0 +1,3 @@
+if [ -e Scanner.h ] 
+  then rm Scanner.h;
+fi

@@ -1,0 +1,12 @@
+int main()
+{
+	int a;
+	j = k;
+	while(a = 1){
+		k = 10;
+	}
+	for (a =10; a < j; a = a+1){
+		c = d;
+	}
+	return 0;
+}
