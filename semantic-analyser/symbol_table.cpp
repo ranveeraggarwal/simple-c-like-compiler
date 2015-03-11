@@ -1,47 +1,72 @@
 #include <string>
 #include <vector>
+#include <unordered_map>
 using namespace std;
 
-class Var
+class Type{
+
+};
+
+class BasicType: public Type{
+public:
+	string identifier;
+};
+
+class ArrayType: public Type{
+
+public:
+	int size;
+	Type type;
+
+};
+
+class Variable
 {
 private:
 	string varname;
-	string type;
+	Type type;
 public:
-	Var(string varname, string type)
+	Variable(){};
+
+	Variable(string varname, Type type)
 	{
-		varname = varname;
-		type = type;
+		this->varname = varname;
+		this->type = type;
 	}
 };
 
-class SymbolTable
+class LocalSymbolTable
 {
-	
+public:
+	string funcName;
+	vector<Variable> parameters;
+	string returnType;
+	unordered_map<string, Variable> variables;
+
+	LocalSymbolTable(string funcName){
+		this->funcName = funcName;
+	}
+
+	LocalSymbolTable(){};
 };
 
-class Gst: public symbolTable
+class GlobalSymbolTable
 {
-private:
-	vector<Lst> lstList;
 public:
-	lst* getLst(string funcName)
+	vector<LocalSymbolTable*> lstList;
+	LocalSymbolTable* getLst(string funcName)
 	{
 		for (unsigned int i = 0; i < lstList.size(); i++)
 		{
-			if (lstList[i].funcName == funcName)
+			if (lstList[i]->funcName == funcName)
 			{
 				return lstList[i];
 			}
-			return nullLst;
+			return nullptr;
 		}
 	}
 };
 
-class Lst: public symbolTable
-{
-private:
-	lst* parentSt;
-	string funcName;
-	vector<Var> scopeVars;
-};
+int main(){
+	return 0;
+}
