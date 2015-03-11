@@ -2,21 +2,46 @@
 #include <vector>
 using namespace std;
 
-class symbolTable
+class Var
 {
-	
-};
-
-class gst: public symbolTable
-{
-	vector<lst> lstList;
-	lst* getLst(string funcName)
+private:
+	string varname;
+	string type;
+public:
+	Var(string varname, string type)
 	{
-
+		varname = varname;
+		type = type;
 	}
 };
 
-class lst: public symbolTable
+class SymbolTable
 {
 	
+};
+
+class Gst: public symbolTable
+{
+private:
+	vector<Lst> lstList;
+public:
+	lst* getLst(string funcName)
+	{
+		for (unsigned int i = 0; i < lstList.size(); i++)
+		{
+			if (lstList[i].funcName == funcName)
+			{
+				return lstList[i];
+			}
+			return nullLst;
+		}
+	}
+};
+
+class Lst: public symbolTable
+{
+private:
+	lst* parentSt;
+	string funcName;
+	vector<Var> scopeVars;
 };
