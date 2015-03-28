@@ -1,4 +1,4 @@
-whitespaces													[\t\n\r ]
+whitespaces													[\t\r ]
 
 /* keywords */
 
@@ -46,7 +46,12 @@ INC_OP														\+\+
 //others
 OTHERS 														\(|\)|\[|\]|;|,|\{|\}
 
+new_line													\n
+
 %%
+{new_line}													{
+																Parser::lineCount++;
+															}
 {whitespaces}												//return Parser::WHITESPACE; Do nothing
 {NOT_OP}													return Parser::NOT_OP;
 {INC_OP}													return Parser::INC_OP;

@@ -7,7 +7,7 @@ int abc(){
 void func(){
 	void d;
 	int c[2][2];
-	c[1][0] = 10;
+	c[1] = 10;
 }
 
 int main(int a, int b)

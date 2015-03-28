@@ -121,7 +121,7 @@ parameter_declaration
         unordered_map<string, Variable*>::iterator it= currentLst->variables.find($2->varname);
         if (it != currentLst->variables.end()){
             cout<<"error: Variable "<<$2->varname<<" in parameter Already defined in function "
-            <<currentLst->funcName<<endl;
+            <<currentLst->funcName<<" at line number "<<lineCount<<endl;
             exit(0);
         }
         else{
@@ -237,7 +237,7 @@ assignment_statement
 	{
         Type* tempType = compatibility_check($1->type, $3->type);
         if (tempType == 0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         }
 
@@ -258,7 +258,7 @@ expression
     {
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -282,7 +282,7 @@ logical_and_expression
     {
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -306,7 +306,7 @@ equality_expression
     {
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -323,7 +323,7 @@ equality_expression
 	{
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -347,7 +347,7 @@ relational_expression
     {
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -364,7 +364,7 @@ relational_expression
 	{
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -381,7 +381,7 @@ relational_expression
 	{
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -398,7 +398,7 @@ relational_expression
     {
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -422,7 +422,7 @@ additive_expression
 	{
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -439,7 +439,7 @@ additive_expression
 	{
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -463,7 +463,7 @@ multiplicative_expression
 	{
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -480,7 +480,7 @@ multiplicative_expression
 	{
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
-            cout<<"Incompatible expressions"<<endl;
+            cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
 
@@ -520,7 +520,7 @@ postfix_expression
             LocalSymbolTable* tempLst = gst->getLst($1);
 
             if (tempLst == 0){
-                cout<<"error: Function "<<$1<<" not defined yet"<<endl;
+                cout<<"error: Function "<<$1<<" not defined yet"<<" at line number "<<lineCount<<endl;
                 exit(0);
             }
 
@@ -533,7 +533,7 @@ postfix_expression
 		{
             LocalSymbolTable* tempLst = gst->getLst($1);
             if (tempLst == 0){
-                cout<<"error: Function "<<$1<<" not defined yet"<<endl;
+                cout<<"error: Function "<<$1<<" not defined yet"<<" at line number "<<lineCount<<endl;
                 exit(0);
             }
 
@@ -544,7 +544,7 @@ postfix_expression
 	| l_expression INC_OP
 	{
         if ($1->type->base == 0){
-            cout<<"++ operator is not allowed on void type"<<endl;
+            cout<<"++ operator is not allowed on void type"<<" at line number "<<lineCount<<endl;
             exit(0);
         }
 
@@ -570,7 +570,7 @@ primary_expression
             $1->type->print();
             cout<<", ";
             $3->type->print();
-            cout<<endl;
+            cout<<" at line number "<<lineCount<<endl;
             exit(0);
         }
         expAst* temp = $1;
@@ -612,7 +612,7 @@ l_expression
     	((identifier*)$$)->value = $1;
         Variable* temp = currentLst->variables[$1];
         if (temp == 0){
-            cout<<"error: ‘"<<$1<<"’ was not declared in this scope "<<endl;
+            cout<<"error: ‘"<<$1<<"’ was not declared in this scope "<<" at line number "<<lineCount<<endl;
             exit(0);
         }
         else{
@@ -625,13 +625,13 @@ l_expression
 
         if (isArray == 0){
             cout<<"error: in function "<<currentLst->funcName<<endl;
-            cout<<"Not an array "<<endl;
+            cout<<"Not an array "<<" at line number "<<lineCount<<endl;
             exit(0);
         }
 
         if($3->type->base != 1){
             cout<<"error: in function "<<currentLst->funcName<<endl;
-            cout<<"Array Indices Not an Integer\n"<<endl;
+            cout<<"Array Indices Not an Integer"<<" at line number "<<lineCount<<endl;
             exit(0);
         }
 
@@ -713,7 +713,7 @@ declarator_list
         unordered_map<string, Variable*>::iterator it= currentLst->variables.find($1->varname);
         if (it != currentLst->variables.end()){
             cout<<"Variable "<<$1->varname<<" in declarations Already defined in function "
-            <<currentLst->funcName<<endl;
+            <<currentLst->funcName<<" at line number "<<lineCount<<endl;
             exit(0);
         }
         else{
@@ -725,7 +725,7 @@ declarator_list
         unordered_map<string, Variable*>::iterator it= currentLst->variables.find($3->varname);
         if (it != currentLst->variables.end()){
             cout<<"Variable "<<$3->varname<<" in declarations Already defined in function "
-            <<currentLst->funcName<<endl;
+            <<currentLst->funcName<<" at line number "<<lineCount<<endl;
             exit(0);
         }
         else{

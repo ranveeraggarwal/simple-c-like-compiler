@@ -8,10 +8,10 @@ sed -i '/include "Parser.h"/a #include "st_helper.cpp"' Parser.ih;
 sed -i '\|STYPE__     d_val__;| d 
 ' Parserbase.h
 
-sed -i '\|typedef Meta__::SType STYPE__;| a \\tpublic: static STYPE__  d_val__;
+sed -i '\|typedef Meta__::SType STYPE__;| a \\tpublic: static STYPE__  d_val__;\nstatic int lineCount;
 ' Parserbase.h 
 
-sed -i '\|void Parser::print__()| i Meta__::SType ParserBase::d_val__;
+sed -i '\|void Parser::print__()| i Meta__::SType ParserBase::d_val__;\nint ParserBase::lineCount=1;
 ' parse.cc
 
 
