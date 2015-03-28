@@ -20,13 +20,15 @@
 //%debug
 %scanner Scanner.h
 %scanner-token-function d_scanner.lex()
-%polymorphic ExpAst : expAst* ; StmAst : stmtAst*; Int : int; Float : float; String : string;
+%polymorphic ExpAst : expAst* ; StmAst : stmtAst*; Int : int; Float : float; String : string; Variable : Variable*; Type : Type*; BasicType : BasicType*;
 
 %type <ExpAst> expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression postfix_expression primary_expression l_expression constant_expression expression_list 
 %type <StmAst> selection_statement iteration_statement assignment_statement translation_unit function_definition compound_statement statement statement_list
 %type <Int> INT_CONSTANT
 %type <Float> FLOAT_CONSTANT
 %type <String> STRING_LITERAL IDENTIFIER unary_operator
+%type <BasicType> type_specifier
+%type <Variable> parameter_declaration declarator
 
 %token NOT_OP ADD_OP SUB_OP MUL_OP DIV_OP LT_OP GL_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP INC_OP VOID INT FLOAT RETURN IF ELSE WHILE FOR 
 
@@ -37,8 +39,14 @@ translation_unit
 	{
 		$$ = $1;
 		$$->print();
+        cout<<endl;
 	}
 	| translation_unit function_definition 
+    {
+        $$ = $2;
+        $$->print();
+        cout<<endl;
+    }
     ;
 
 function_definition
@@ -50,27 +58,88 @@ function_definition
 
 type_specifier
 	: VOID 	
-    | INT   
+    {
+        $$ = new BasicType();
+        ($$)->identifier = "void";
+        ($$)->size = 0;
+        type = $$;
+    }
+    | INT  
+    {
+        $$ = new BasicType();
+        ($$)->identifier = "int";
+        ($$)->size = 4;
+        type = $$;
+    } 
 	| FLOAT 
+    {
+        $$ = new BasicType();
+        ($$)->identifier = "int";
+        ($$)->size = 4;
+        type = $$;
+    }
     ;
 
 fun_declarator
 	: IDENTIFIER '(' parameter_list ')' 
-    | IDENTIFIER '(' ')' 
+    {
+        scope = 1;
+    }
+    | IDENTIFIER '(' ')'
+    {
+        scope = 1;
+    } 
 	;
 
 parameter_list
 	: parameter_declaration 
+    {
+        scope = 2;
+    }
 	| parameter_list ',' parameter_declaration 
+    {
+        scope = 2;
+    }
 	;
 
 parameter_declaration
-	: type_specifier declarator 
+	: type_specifier declarator
+    {
+        cout<<"var:: "<<$2->varname<<endl;
+        unordered_map<string, Variable*>::iterator it= currentLst->variables.find($2->varname);
+        if (it != currentLst->variables.end()){
+            cout<<"Variable "<<$2->varname<<" Already defined"<<endl;
+        }
+        else{
+            currentLst->variables[$2->varname] = $2;
+        }
+    }
     ;
 
 declarator
 	: IDENTIFIER 
-	| declarator '[' constant_expression ']' 
+    {
+        $$ = new Variable();
+        
+        $$->varname = $1;
+        $$->scope = scope;
+        $$->type = type;
+        $$->size = type->size;
+        $$->offset = offset;
+        offset += $$->size;
+    
+    }
+    
+	| declarator '[' constant_expression ']'
+    {
+        $$ = $1;
+        ArrayType* temp = new ArrayType();
+        temp->type = $1->type;
+        temp->size = ((int_constant*)$3)->value;
+        offset -= $$->size;
+        $$->size *=  temp->size;
+        offset += $$->size;
+    }
     ;
 
 constant_expression 
@@ -392,8 +461,9 @@ l_expression
     }
     | l_expression '[' expression ']'
     {
+        arrayRef* temp = (arrayRef*)$<ExpAst>1;
     	$$ = new index();
-    	((index*)$$)->arr = ((arrayRef*)$<ExpAst>1);
+    	((index*)$$)->arr = temp;
     	((index*)$$)->exp = ($<ExpAst>3);
     }
     ;

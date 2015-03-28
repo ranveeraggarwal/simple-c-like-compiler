@@ -1,7 +1,7 @@
-int main()
+int main(int a, int b, int a)
 {
-	int a;
 	j = k;
+	c = b[1];
 	while(a = 1){
 		k = 10;
 	}
@@ -9,4 +9,15 @@ int main()
 		c = d;
 	}
 	return 0;
+}
+
+int abc(){
+	int a;
+	int b;
+	a = b;
+}
+
+void temp(){
+	int k;
+	c = d;
 }
