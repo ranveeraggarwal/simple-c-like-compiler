@@ -1,5 +1,6 @@
 int main(int a, int b, int a)
 {
+	int j,k,g;
 	j = k;
 	c = b[1];
 	while(a = 1){
@@ -11,13 +12,13 @@ int main(int a, int b, int a)
 	return 0;
 }
 
-int abc(){
+int abc(int a){
 	int a;
 	int b;
 	a = b;
 }
 
-void temp(){
+void temp(int fart){
 	int k;
 	c = d;
 }

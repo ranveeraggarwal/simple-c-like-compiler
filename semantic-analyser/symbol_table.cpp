@@ -52,7 +52,7 @@ class LocalSymbolTable
 {
 public:
 	string funcName;
-	string returnType;
+	Type* returnType;
 	unordered_map<string, Variable*> variables;
 
 	LocalSymbolTable(string funcName){

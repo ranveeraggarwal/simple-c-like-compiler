@@ -81,7 +81,14 @@ type_specifier
     ;
 
 fun_declarator
-	: IDENTIFIER '(' parameter_list ')' 
+	: IDENTIFIER '('
+    {
+        currentLst = new LocalSymbolTable($1);
+        currentLst->returnType = type;
+        gst->lstList.push_back(currentLst);
+        offset = 0;
+    } 
+    parameter_list ')' 
     {
         scope = 1;
     }
@@ -105,10 +112,11 @@ parameter_list
 parameter_declaration
 	: type_specifier declarator
     {
-        cout<<"var:: "<<$2->varname<<endl;
+        cout<<"Current Function: "<<currentLst->funcName<<endl;
         unordered_map<string, Variable*>::iterator it= currentLst->variables.find($2->varname);
         if (it != currentLst->variables.end()){
-            cout<<"Variable "<<$2->varname<<" Already defined"<<endl;
+            cout<<"Variable "<<$2->varname<<" in parameter Already defined in function "
+            <<currentLst->funcName<<endl;
         }
         else{
             currentLst->variables[$2->varname] = $2;
@@ -533,5 +541,27 @@ declaration
 
 declarator_list
 	: declarator
+    {
+        cout<<"Variable: "<<$1->varname<<" Current Function: "<<currentLst->funcName<<endl;
+        unordered_map<string, Variable*>::iterator it= currentLst->variables.find($1->varname);
+        if (it != currentLst->variables.end()){
+            cout<<"Variable "<<$1->varname<<" in declarations Already defined in function "
+            <<currentLst->funcName<<endl;
+        }
+        else{
+            currentLst->variables[$1->varname] = $1;
+        }
+    }
 	| declarator_list ',' declarator 
+    {
+        cout<<"Variable: "<<$3->varname<<" Current Function: "<<currentLst->funcName<<endl;
+        unordered_map<string, Variable*>::iterator it= currentLst->variables.find($3->varname);
+        if (it != currentLst->variables.end()){
+            cout<<"Variable "<<$3->varname<<" in declarations Already defined in function "
+            <<currentLst->funcName<<endl;
+        }
+        else{
+            currentLst->variables[$3->varname] = $3;
+        }
+    }
 	;
