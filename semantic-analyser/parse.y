@@ -61,6 +61,7 @@ function_definition
 	: type_specifier fun_declarator compound_statement 
 		{
 			$$ = $3;
+            scope = 0;
 		}
 	;
 
@@ -89,6 +90,7 @@ fun_declarator
         currentLst->returnType = type;
         gst->lstList.push_back(currentLst);
         offset = 0;
+        scope = 2;
     } 
     parameter_list ')' 
     {
@@ -220,6 +222,12 @@ statement
 	}
 	| RETURN expression ';'	
 	{
+        Type* tempType = extended_compatibility_check($2->type, currentLst->returnType);
+        if (tempType == 0){
+            cout<<"return type of function "<<currentLst->funcName<<" is not same as return statement type at line "
+            <<lineCount<<endl;
+            exit(0);
+        }
 		$$ = new return_stmt();
 		((return_stmt*)$$)->exp = ($<ExpAst>2);
 		
@@ -536,9 +544,8 @@ postfix_expression
                 cout<<"error: Function "<<$1<<" not defined yet"<<" at line number "<<lineCount<<endl;
                 exit(0);
             }
-
+            $$=$3;
 			((fun_call*)$$)->fun_name = $1;
-			$$=$3;
             $$->type = tempLst->returnType;
 		}
 	| l_expression INC_OP

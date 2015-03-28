@@ -78,10 +78,11 @@ public:
 	LocalSymbolTable(){};
 
 	void print(){
-		cout<<"\tLocal Symbol Table for function: "<<funcName<<endl;
+		cout<<"\n\tLocal Symbol Table for function: "<<funcName<<endl;
 		cout<<"\tReturn Type: ";
 		returnType->print();
 		cout<<endl;
+		cout<<"\t\tName\ttype\tscope\tsize\toffset\t"<<endl;
 		for ( auto it = variables.begin(); it != variables.end(); ++it ){
 			Variable* temp = it->second;
 			cout<<"\t\t"<<temp->varname<<"\t";

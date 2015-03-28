@@ -1,19 +1,18 @@
-int abc(){
+int abc(int i){
 	int a;
 	a = 0;
-	return a;
 }
 
 void func(){
 	void d;
 	int c[2][2];
-	c[1] = 10;
+	c[1][2] = 10;
 }
 
 int main(int a, int b)
 {
 	int j,k;
-	j = abc();
+	j = abc(k);
 	return 0;
 }
 
