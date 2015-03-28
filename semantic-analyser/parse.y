@@ -20,19 +20,27 @@
 //%debug
 %scanner Scanner.h
 %scanner-token-function d_scanner.lex()
-%polymorphic ExpAst : expAst* ; StmAst : stmtAst*; Int : int; Float : float; String : string; Variable : Variable*; Type : Type*; BasicType : BasicType*;
+%polymorphic ExpAst : expAst* ; StmAst : stmtAst*; Int : int; Float : float; String : string; Variable : Variable*; Type : Type*;
+%lsp-needed
 
 %type <ExpAst> expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression postfix_expression primary_expression l_expression constant_expression expression_list 
 %type <StmAst> selection_statement iteration_statement assignment_statement translation_unit function_definition compound_statement statement statement_list
 %type <Int> INT_CONSTANT
 %type <Float> FLOAT_CONSTANT
 %type <String> STRING_LITERAL IDENTIFIER unary_operator
-%type <BasicType> type_specifier
+%type <Type> type_specifier
 %type <Variable> parameter_declaration declarator
 
 %token NOT_OP ADD_OP SUB_OP MUL_OP DIV_OP LT_OP GL_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP INC_OP VOID INT FLOAT RETURN IF ELSE WHILE FOR 
 
 %%
+
+program
+    : translation_unit
+    {
+        gst->print();
+    }
+    ;
 
 translation_unit
 	: function_definition 
@@ -59,23 +67,17 @@ function_definition
 type_specifier
 	: VOID 	
     {
-        $$ = new BasicType();
-        ($$)->identifier = "void";
-        ($$)->size = 0;
+        $$ = new Type(0);
         type = $$;
     }
     | INT  
     {
-        $$ = new BasicType();
-        ($$)->identifier = "int";
-        ($$)->size = 4;
+        $$ = new Type(1);
         type = $$;
     } 
 	| FLOAT 
     {
-        $$ = new BasicType();
-        ($$)->identifier = "int";
-        ($$)->size = 4;
+        $$ = new Type(2);
         type = $$;
     }
     ;
@@ -92,8 +94,12 @@ fun_declarator
     {
         scope = 1;
     }
-    | IDENTIFIER '(' ')'
+    | IDENTIFIER '('  ')'
     {
+        currentLst = new LocalSymbolTable($1);
+        currentLst->returnType = type;
+        gst->lstList.push_back(currentLst);
+        offset = 0;
         scope = 1;
     } 
 	;
@@ -112,11 +118,11 @@ parameter_list
 parameter_declaration
 	: type_specifier declarator
     {
-        cout<<"Current Function: "<<currentLst->funcName<<endl;
         unordered_map<string, Variable*>::iterator it= currentLst->variables.find($2->varname);
         if (it != currentLst->variables.end()){
-            cout<<"Variable "<<$2->varname<<" in parameter Already defined in function "
+            cout<<"error: Variable "<<$2->varname<<" in parameter Already defined in function "
             <<currentLst->funcName<<endl;
+            exit(0);
         }
         else{
             currentLst->variables[$2->varname] = $2;
@@ -141,9 +147,8 @@ declarator
 	| declarator '[' constant_expression ']'
     {
         $$ = $1;
-        ArrayType* temp = new ArrayType();
-        temp->type = $1->type;
-        temp->size = ((int_constant*)$3)->value;
+        Type *temp =  new Type($1->type,((int_constant*)$3)->value);
+        $$->type = temp;
         offset -= $$->size;
         $$->size *=  temp->size;
         offset += $$->size;
@@ -230,9 +235,17 @@ assignment_statement
 	} 								
 	|  l_expression '=' expression ';'
 	{
+        Type* tempType = compatibility_check($1->type, $3->type);
+        if (tempType == 0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        }
+
 		$$ = new ass();
 		((ass*)$$)->exp1 = $1;
 		((ass*)$$)->exp2 = $3;
+
+
 	}	
 	;
 
@@ -243,12 +256,20 @@ expression
     }
     | expression OR_OP logical_and_expression
     {
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "||";
     	((op*)$$)->optype = 1;
+
+        $$->type = new Type(1);
     }
 	;
 
@@ -259,12 +280,20 @@ logical_and_expression
     }
     | logical_and_expression AND_OP equality_expression 
     {
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "&&";
     	((op*)$$)->optype = 1;
+
+        $$->type = new Type(1);
     }
 	;
 
@@ -275,21 +304,37 @@ equality_expression
     }
     | equality_expression EQ_OP relational_expression 	
     {
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "==";
     	((op*)$$)->optype = 1;
+
+        $$->type = new Type(1);
     }
 	| equality_expression NE_OP relational_expression
 	{
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "!=";
     	((op*)$$)->optype = 1;
+
+        $$->type = new Type(1);
     }
 	;
 
@@ -300,39 +345,71 @@ relational_expression
     }
     | relational_expression '<' additive_expression 
     {
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "<";
     	((op*)$$)->optype = 1;
+
+        $$->type = new Type(1);
     }
 	| relational_expression '>' additive_expression 
 	{
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = ">";
     	((op*)$$)->optype = 1;
+
+        $$->type = new Type(1);
     }
 	| relational_expression LE_OP additive_expression 
 	{
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "<=";
     	((op*)$$)->optype = 1;
+
+        $$->type = new Type(1);
     }
     | relational_expression GE_OP additive_expression 
     {
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = ">=";
     	((op*)$$)->optype = 1;
+
+        $$->type = new Type(1);
     }
 	;
 
@@ -343,21 +420,37 @@ additive_expression
     }
 	| additive_expression '+' multiplicative_expression
 	{
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "+";
     	((op*)$$)->optype = 1;
+
+        $$->type = tempType;
     } 
 	| additive_expression '-' multiplicative_expression 
 	{
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "-";
     	((op*)$$)->optype = 1;
+
+        $$->type = tempType;
     }
 	;
 
@@ -368,21 +461,37 @@ multiplicative_expression
     }
 	| multiplicative_expression '*' unary_expression 
 	{
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "*";
     	((op*)$$)->optype = 1;
+
+        $$->type = tempType;
     }
 	| multiplicative_expression '/' unary_expression 
 	{
+        Type* tempType = arithmetic_check($1->type, $3->type);
+        if(tempType==0){
+            cout<<"Incompatible expressions"<<endl;
+            exit(0);
+        };
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "/";
     	((op*)$$)->optype = 1;
+
+        $$->type = tempType;
     }
 	;
 
@@ -408,21 +517,43 @@ postfix_expression
     }
     | IDENTIFIER '(' ')'
 	    {
+            LocalSymbolTable* tempLst = gst->getLst($1);
+
+            if (tempLst == 0){
+                cout<<"error: Function "<<$1<<" not defined yet"<<endl;
+                exit(0);
+            }
+
 	    	$$ = new fun_call();
 	    	((fun_call*)$$)->fun_name = $1;
+            $$->type = tempLst->returnType;
+
 	    }
 	| IDENTIFIER '(' expression_list ')' 
 		{
+            LocalSymbolTable* tempLst = gst->getLst($1);
+            if (tempLst == 0){
+                cout<<"error: Function "<<$1<<" not defined yet"<<endl;
+                exit(0);
+            }
+
 			((fun_call*)$$)->fun_name = $1;
 			$$=$3;
+            $$->type = tempLst->returnType;
 		}
 	| l_expression INC_OP
 	{
+        if ($1->type->base == 0){
+            cout<<"++ operator is not allowed on void type"<<endl;
+            exit(0);
+        }
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->opcode = "++";
     	((op*)$$)->optype = 0;
+        $$->type = $1->type;
     }
 	;
 
@@ -433,22 +564,35 @@ primary_expression
     }
     | l_expression '=' expression // added this production
     {
+        Type* typeTemp = compatibility_check($1->type, $3->type);
+        if (typeTemp == 0){
+            cout<<"Incompatible tyeps ";
+            $1->type->print();
+            cout<<", ";
+            $3->type->print();
+            cout<<endl;
+            exit(0);
+        }
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->exp2 = ($<ExpAst>3);
     	((op*)$$)->opcode = "=";
     	((op*)$$)->optype = 1;
+
+        $$->type = typeTemp;
     }
 	| INT_CONSTANT
 	{
     	($$) = new int_constant();
     	((int_constant*)$$)->value = $1;
+        $$->type = new Type(1);
     }
 	| FLOAT_CONSTANT
 		{
     	($$) = new float_constant();
     	((float_constant*)$$)->value = $1;
+        $$->type = new Type(2);
     	}	
     | STRING_LITERAL
     {
@@ -466,13 +610,37 @@ l_expression
     {   
         $$ = new identifier();
     	((identifier*)$$)->value = $1;
+        Variable* temp = currentLst->variables[$1];
+        if (temp == 0){
+            cout<<"error: ‘"<<$1<<"’ was not declared in this scope "<<endl;
+            exit(0);
+        }
+        else{
+            $$->type = temp->type;
+        }
     }
     | l_expression '[' expression ']'
     {
+        Type* isArray = $1->type->child;
+
+        if (isArray == 0){
+            cout<<"error: in function "<<currentLst->funcName<<endl;
+            cout<<"Not an array "<<endl;
+            exit(0);
+        }
+
+        if($3->type->base != 1){
+            cout<<"error: in function "<<currentLst->funcName<<endl;
+            cout<<"Array Indices Not an Integer\n"<<endl;
+            exit(0);
+        }
+
         arrayRef* temp = (arrayRef*)$<ExpAst>1;
     	$$ = new index();
     	((index*)$$)->arr = temp;
     	((index*)$$)->exp = ($<ExpAst>3);
+
+        $$->type = isArray;
     }
     ;
 
@@ -542,11 +710,11 @@ declaration
 declarator_list
 	: declarator
     {
-        cout<<"Variable: "<<$1->varname<<" Current Function: "<<currentLst->funcName<<endl;
         unordered_map<string, Variable*>::iterator it= currentLst->variables.find($1->varname);
         if (it != currentLst->variables.end()){
             cout<<"Variable "<<$1->varname<<" in declarations Already defined in function "
             <<currentLst->funcName<<endl;
+            exit(0);
         }
         else{
             currentLst->variables[$1->varname] = $1;
@@ -554,11 +722,11 @@ declarator_list
     }
 	| declarator_list ',' declarator 
     {
-        cout<<"Variable: "<<$3->varname<<" Current Function: "<<currentLst->funcName<<endl;
         unordered_map<string, Variable*>::iterator it= currentLst->variables.find($3->varname);
         if (it != currentLst->variables.end()){
             cout<<"Variable "<<$3->varname<<" in declarations Already defined in function "
             <<currentLst->funcName<<endl;
+            exit(0);
         }
         else{
             currentLst->variables[$3->varname] = $3;

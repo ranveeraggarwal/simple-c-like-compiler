@@ -3,26 +3,43 @@
 #include <unordered_map>
 using namespace std;
 
-class Type{
-	public:
-		int size;
-		Type(){};
-};
+struct Type{
+	int size;
+	int base;
+	Type* child;
+	Type(){size = -1; child=NULL;}
+	Type(int tp){
+		child = NULL;
+		switch(tp){
+			case 0: // VOID
+				size = 0;
+				base = 0;
+				break;
+			case 1: // INT
+				size = 4;
+				base = 1;
+				break;
+			case 2: // FLOAT
+				size = 4;
+				base = 2;
+				break;
+		}
+	}
+	Type(Type* c,int s){
+		child = c;
+		size = s;
+	}
 
-class BasicType: public Type{
-public:
-	string identifier;
-	BasicType(){
-		size = 0;
-	};
-};
-
-class ArrayType: public Type{
-
-public:
-	Type* type;
-	ArrayType(){};
-
+	void print(){
+		if(child != NULL){
+			cout<<"array("<<size<<",";
+				child->print();
+			cout<<")";
+		}
+		else if(base == 0) cout<<"void";
+		else if(base == 1) cout<<"int";
+		else if(base == 2) cout<<"float";
+	}
 };
 
 class Variable
@@ -42,7 +59,6 @@ public:
 
 	Variable(string varname, Type* type)
 	{
-		cout<<varname<<" "<<((BasicType*)type)->identifier<<endl;
 		this->varname = varname;
 		this->type = type;
 	}
@@ -60,6 +76,19 @@ public:
 	}
 
 	LocalSymbolTable(){};
+
+	void print(){
+		cout<<"\tLocal Symbol Table for function: "<<funcName<<endl;
+		cout<<"\tReturn Type: ";
+		returnType->print();
+		cout<<endl;
+		for ( auto it = variables.begin(); it != variables.end(); ++it ){
+			Variable* temp = it->second;
+			cout<<"\t\t"<<temp->varname<<"\t";
+			temp->type->print();
+			cout<<"\t"<<temp->scope<<"\t"<<temp->size<<"\t"<<temp->offset<<endl;
+		}
+	}
 };
 
 class GlobalSymbolTable
@@ -75,13 +104,23 @@ public:
 	{
 		for (unsigned int i = 0; i < lstList.size(); i++)
 		{
+
 			if (lstList[i]->funcName == funcName)
 			{
 				return lstList[i];
 			}
-			return nullptr;
+			
+		}
+		return nullptr;
+	}
+
+	void print(){
+		cout<<"\n\nPrinting SymbolTables:"<<endl;
+		for (int i = 0; i< lstList.size(); i++){
+			lstList[i]->print();
 		}
 	}
+
 };
 
 /*

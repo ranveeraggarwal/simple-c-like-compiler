@@ -20,6 +20,7 @@ private:
 class expAst: public abstract_astnode
 {
 public:
+	Type* type;
 	virtual void print() = 0;
 	expAst(){}
 	
