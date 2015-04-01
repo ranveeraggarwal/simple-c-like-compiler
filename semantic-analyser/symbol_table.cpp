@@ -69,8 +69,9 @@ class LocalSymbolTable
 public:
 	string funcName;
 	Type* returnType;
+	bool checkParam = true;
 	unordered_map<string, Variable*> variables;
-
+	vector<Variable*> params;
 	LocalSymbolTable(string funcName){
 		this->funcName = funcName;
 	}
@@ -98,7 +99,12 @@ public:
 	vector<LocalSymbolTable*> lstList;
 
 	GlobalSymbolTable(){
-
+		
+		LocalSymbolTable* tempLst = new LocalSymbolTable();
+		tempLst->funcName = "printf";
+		tempLst->returnType = new Type(0);
+		tempLst->checkParam = false;
+		this->lstList.push_back(tempLst);
 	}
 
 	LocalSymbolTable* getLst(string funcName)
@@ -123,14 +129,3 @@ public:
 	}
 
 };
-
-/*
-	0: global
-	1: local to function
-	2: param
- */
-extern int scope;
-extern Type* type;
-extern int offset;
-extern GlobalSymbolTable* gst;
-extern LocalSymbolTable* currentLst;

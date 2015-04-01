@@ -5,14 +5,18 @@ int abc(int i){
 
 void func(){
 	void d;
+	int a,b;
 	int c[2][2];
 	c[1][2] = 10;
+	printf("Hello World");
+	abc(a);
 }
 
 int main(int a, int b)
 {
 	int j,k;
-	j = abc(k);
+	j = k;
+	k = abc(k);
 	return 0;
 }
 

@@ -20,16 +20,17 @@
 //%debug
 %scanner Scanner.h
 %scanner-token-function d_scanner.lex()
-%polymorphic ExpAst : expAst* ; StmAst : stmtAst*; Int : int; Float : float; String : string; Variable : Variable*; Type : Type*;
+%polymorphic exp_list: exp_list*; ExpAst : expAst* ; StmAst : stmtAst*; Int : int; Float : float; String : string; Variable : Variable*; Type : Type*;
 %lsp-needed
 
-%type <ExpAst> expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression postfix_expression primary_expression l_expression constant_expression expression_list 
+%type <ExpAst> expression logical_and_expression equality_expression relational_expression additive_expression multiplicative_expression unary_expression postfix_expression primary_expression l_expression constant_expression 
 %type <StmAst> selection_statement iteration_statement assignment_statement translation_unit function_definition compound_statement statement statement_list
 %type <Int> INT_CONSTANT
 %type <Float> FLOAT_CONSTANT
 %type <String> STRING_LITERAL IDENTIFIER unary_operator
 %type <Type> type_specifier
 %type <Variable> parameter_declaration declarator
+%type <exp_list> expression_list
 
 %token NOT_OP ADD_OP SUB_OP MUL_OP DIV_OP LT_OP GL_OP LE_OP GE_OP EQ_OP NE_OP AND_OP OR_OP INC_OP VOID INT FLOAT RETURN IF ELSE WHILE FOR 
 
@@ -128,6 +129,7 @@ parameter_declaration
         }
         else{
             currentLst->variables[$2->varname] = $2;
+            currentLst->params.push_back($2);
         }
     }
     ;
@@ -232,6 +234,23 @@ statement
 		((return_stmt*)$$)->exp = ($<ExpAst>2);
 		
 	}
+    | IDENTIFIER '(' 
+    {
+        LocalSymbolTable* tempLst = gst->getLst($1);
+        if (tempLst == 0){
+            cout<<"error: Function "<<$1<<" not defined yet"<<" at line number "<<lineCount<<endl;
+            exit(0);
+        }
+        currentLstCalled = tempLst;
+        paramCount = 0;
+    }
+    expression_list ')' ';' 
+    {
+
+        $$ = new fun_call_stmt();
+        ((fun_call_stmt*)$$)->fun_name = $1;
+        ((fun_call_stmt*)$$)->expList = $4;
+    }
 	;
 
 assignment_statement
@@ -537,17 +556,27 @@ postfix_expression
             $$->type = tempLst->returnType;
 
 	    }
-	| IDENTIFIER '(' expression_list ')' 
-		{
-            LocalSymbolTable* tempLst = gst->getLst($1);
-            if (tempLst == 0){
-                cout<<"error: Function "<<$1<<" not defined yet"<<" at line number "<<lineCount<<endl;
-                exit(0);
-            }
-            $$=$3;
-			((fun_call*)$$)->fun_name = $1;
-            $$->type = tempLst->returnType;
-		}
+    | IDENTIFIER '(' 
+    {
+        LocalSymbolTable* tempLst = gst->getLst($1);
+        if (tempLst == 0){
+            cout<<"error: Function "<<$1<<" not defined yet"<<" at line number "<<lineCount<<endl;
+            exit(0);
+        }
+        currentLstCalled = tempLst;
+        paramCount = 0;
+    }
+    expression_list ')'
+    {
+    
+        LocalSymbolTable* tempLst = gst->getLst($1);
+
+        $$ = new fun_call();
+        ((fun_call*)$$)->fun_name = $1;
+        $$->type = tempLst->returnType;
+        ((fun_call*)$$)->expList = $4;
+    }
+
 	| l_expression INC_OP
 	{
         if ($1->type->base == 0){
@@ -654,14 +683,48 @@ l_expression
 expression_list
     : expression
     	{
+            
+            if (currentLstCalled->checkParam) {
+                if (paramCount >= currentLstCalled->params.size()){
+                    cout<<"function "<<currentLstCalled->funcName<<" is defined with "<<currentLstCalled->params.size()
+                    <<" but is called with more number of arguments at line number "<<lineCount<<endl;
+                    exit(0);
+                }
+
+                Variable* tempVar = currentLstCalled->params[paramCount];
+
+                Type* tempType = compatibility_check($1->type, tempVar->type);
+                if (tempType  == 0){
+                    cout<<"Param types defined is not same as called in line number "<<lineCount<<endl;
+                    exit(0);
+                }
+                paramCount++;
+                
+            }
+
     		expAst *temp = $1;
-    		$$ = new fun_call();
-    		((fun_call*)$$)->v.push_back(temp);
+    		$$ = new exp_list();
+    		((exp_list*)$$)->v.push_back(temp);
     	}
     | expression_list ',' expression
 	    {
+            if (currentLstCalled->checkParam) {
+                if (paramCount >= currentLstCalled->params.size()){
+                    cout<<"function "<<currentLstCalled->funcName<<" is defined with "<<currentLstCalled->params.size()
+                    <<" arguments only but is called with more number of arguments at line number "<<lineCount<<endl;
+                    exit(0);
+                }
+                Variable* tempVar = currentLstCalled->params[paramCount];
+                Type* tempType = compatibility_check($3->type, tempVar->type);
+                if (tempType  == 0){
+                    cout<<"Param types defined is not same as called in line number "<<lineCount<<endl;
+                    exit(0);
+                }
+                paramCount++;
+            }
+
 	    	$$ = $1;
-	    	((fun_call*)$$)->v.push_back($3);
+	    	((exp_list*)$$)->v.push_back($3);
 	    }
     ;
 

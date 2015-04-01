@@ -8,6 +8,8 @@ Type* type = NULL;
 int offset = 0;
 GlobalSymbolTable* gst = new GlobalSymbolTable();
 LocalSymbolTable* currentLst = new LocalSymbolTable();
+LocalSymbolTable* currentLstCalled = new LocalSymbolTable();
+int paramCount = 0;
 
 Type* arithmetic_check(Type* first, Type* second){
 	if (first->base == 1 && second->base == 1){

@@ -89,23 +89,52 @@ public:
 	}
 };
 
-class fun_call: public expAst
+class exp_list
 {
 public:
-	string fun_name;
 	std::vector<expAst*> v;
-	fun_call(){}
-	
+	exp_list(){};
 
 	void print()
 	{
-		cout << fun_name;
 		for (int i = 0; i < v.size(); i++)
 		{
 			cout << " ";
 			v[i]->print();
 		}
-		cout << ")";
+	}
+};
+
+class fun_call: public expAst
+{
+public:
+	string fun_name;
+	exp_list* expList;
+	fun_call(){}
+	
+
+	void print()
+	{
+		cout<<"(";
+		cout << fun_name;
+		expList->print();
+		cout<<")";
+	}
+};
+
+class fun_call_stmt: public stmtAst
+{
+public:
+	string fun_name;
+	exp_list* expList;
+	fun_call_stmt(){}
+	
+	void print()
+	{
+		cout<<"(";
+		cout << fun_name;
+		expList->print();
+		cout<<")";
 	}
 };
 
