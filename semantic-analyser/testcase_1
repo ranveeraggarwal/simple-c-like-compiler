@@ -14,8 +14,14 @@ void func(){
 
 int main(int a, int b)
 {
+	float f;
+	int abc;
 	int j,k;
 	k = abc(k);
+	j = f;
+	f = k;
+	j = k;
+	abc(5);
 	return 0;
 }
 
