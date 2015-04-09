@@ -28,6 +28,7 @@ struct Type{
 	Type(Type* c,int s){
 		child = c;
 		size = s;
+		
 	}
 
 	void print(){
@@ -83,12 +84,25 @@ public:
 		cout<<"\tReturn Type: ";
 		returnType->print();
 		cout<<endl;
-		cout<<"\t\tName\ttype\tscope\tsize\toffset\t"<<endl;
+		cout<<"\tArguments:"<<endl;
+		cout<<"\t\tName\tsize\toffset\ttype"<<endl;
+		for (int i=0; i< params.size(); i++){
+			Variable* temp = params[i];
+			cout<<"\t\t"<<temp->varname;
+			cout<<"\t"<<temp->size<<"\t"<<temp->offset<<"\t";
+			temp->type->print();
+			cout<<endl;
+		}
+		cout<<endl;
+		cout<<"\tLocal Variables:"<<endl;
+		cout<<"\t\tName\tsize\toffset\ttype"<<endl;
 		for ( auto it = variables.begin(); it != variables.end(); ++it ){
 			Variable* temp = it->second;
-			cout<<"\t\t"<<temp->varname<<"\t";
+			if (temp->scope == 2) continue;
+			cout<<"\t\t"<<temp->varname;
+			cout<<"\t"<<temp->size<<"\t"<<temp->offset<<"\t";
 			temp->type->print();
-			cout<<"\t"<<temp->scope<<"\t"<<temp->size<<"\t"<<temp->offset<<endl;
+			cout<<endl;
 		}
 	}
 };

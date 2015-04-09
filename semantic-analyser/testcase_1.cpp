@@ -4,9 +4,9 @@ int abc(int i){
 }
 
 void func(){
-	int d;
+	void d;
 	int a,b;
-	void c[2][2];
+	int c[2][2];
 	c[1][2] = c[1][2];
 	printf("Hello World");
 	abc(a);
