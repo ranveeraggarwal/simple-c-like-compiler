@@ -261,10 +261,15 @@ public:
 		}
 		else
 		{
-			cout << "(Ass ";
+			cout << "(Ass (";
+			exp1->type->print();
+			cout<<" ";
 			exp1->print();
+			cout<<") (";
+			exp2->type->print();
+			cout<<" ";
 			exp2->print();
-			cout << ")";
+			cout << "))";
 		}
 	}
 };
