@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <typeinfo>
+#include "ast.h"
 using namespace std;
 
 class Register
