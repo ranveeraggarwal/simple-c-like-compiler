@@ -63,6 +63,7 @@ public:
 
 	void print()
 	{
+		cout << nextLabel();
 		if (!optype)
 		{
 			cout << "(" << opcode << " ";

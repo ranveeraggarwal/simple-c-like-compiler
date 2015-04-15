@@ -14,6 +14,14 @@ GlobalSymbolTable* gst = new GlobalSymbolTable();
 LocalSymbolTable* currentLst = new LocalSymbolTable();
 LocalSymbolTable* currentLstCalled = new LocalSymbolTable();
 int paramCount = 0;
+int labelNumber = 0;
+
+string nextLabel()
+{
+	string newLabel = "l" + to_string(labelNumber);
+	labelNumber++;
+	return newLabel;
+}
 
 Type* arithmetic_check(Type* first, Type* second){
 	if (first->base == 1 && second->base == 1){
