@@ -14,8 +14,6 @@ sed -i '\|typedef Meta__::SType STYPE__;| a \\tpublic: static STYPE__  d_val__;\
 sed -i '\|void Parser::print__()| i Meta__::SType ParserBase::d_val__;\nint ParserBase::lineCount=1;
 ' parse.cc
 
-
-
 #Observe how the delimiter was changed from / to |
 #-i for inplace update
 # d for delete

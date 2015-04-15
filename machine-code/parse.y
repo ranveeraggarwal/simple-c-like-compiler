@@ -138,7 +138,10 @@ declarator
 	: IDENTIFIER 
     {
         $$ = new Variable();
-        
+        if (type->base == 0){
+            cout<<"Variable or field '"<<$1<<"' declared void at line number "<<lineCount<<endl;
+            exit(0);
+        }
         $$->varname = $1;
         $$->scope = scope;
         $$->type = type;

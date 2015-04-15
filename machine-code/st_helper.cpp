@@ -3,6 +3,10 @@
 	1: local to function
 	2: param
  */
+#include <iostream>
+#include <fstream>
+using namespace std;
+
 int scope = 0;
 Type* type = NULL;
 int offset = 0;

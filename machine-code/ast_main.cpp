@@ -4,6 +4,16 @@
 #include <typeinfo>
 using namespace std;
 
+class Register
+{
+public:
+	string name;
+};
+
+class Code{
+
+};
+
 class abstract_astnode
 {
 public:
@@ -261,10 +271,15 @@ public:
 		}
 		else
 		{
-			cout << "(Ass ";
+			cout << "(Ass (";
+			exp1->type->print();
+			cout<<" ";
 			exp1->print();
+			cout<<") (";
+			exp2->type->print();
+			cout<<" ";
 			exp2->print();
-			cout << ")";
+			cout << "))";
 		}
 	}
 };
@@ -342,10 +357,3 @@ public:
 	}
 };
 
-/*
-int main(int argc, char const *argv[])
-{
-	
-	return 0;
-}
-*/
