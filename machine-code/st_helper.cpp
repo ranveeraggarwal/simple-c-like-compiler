@@ -5,8 +5,10 @@
  */
 #include <iostream>
 #include <fstream>
+#include <string>
 using namespace std;
 
+string typeArray[] = {"void", "int", "float"};
 int scope = 0;
 Type* type = NULL;
 int offset = 0;
@@ -15,8 +17,20 @@ LocalSymbolTable* currentLst = new LocalSymbolTable();
 LocalSymbolTable* currentLstCalled = new LocalSymbolTable();
 int paramCount = 0;
 
+Type* copyType(Type* type){
+	Type *temp = new Type();
+	if (type->child != NULL){
+		temp->child = copyType(type->child);
+	}
+
+	temp->base = type->base;
+	temp->size = type->size;
+	temp->isCasted = false;
+	return temp;
+}
 
 Type* arithmetic_check(Type* first, Type* second){
+	if (first->child  != NULL || second->child != NULL) return NULL;
 	if (first->base == 1 && second->base == 1){
 		return first;
 	}

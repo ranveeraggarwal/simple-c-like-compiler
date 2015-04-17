@@ -233,6 +233,9 @@ statement
             <<lineCount<<endl;
             exit(0);
         }
+        if (currentLst->returnType->base != $2->type->base){
+            $2->type->castTo(currentLst->returnType);
+        }
 		$$ = new return_stmt();
 		((return_stmt*)$$)->exp = ($<ExpAst>2);
 		
@@ -270,6 +273,8 @@ assignment_statement
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         }
+        if (tempType->base != $1->type->base) $1->type->castTo(tempType);
+        if (tempType->base != $3->type->base) $3->type->castTo(tempType);
 
 		$$ = new ass();
 		((ass*)$$)->exp1 = $1;
@@ -381,6 +386,9 @@ relational_expression
             exit(0);
         };
 
+        if (tempType->base != $1->type->base) $1->type->castTo(tempType);
+        if (tempType->base != $3->type->base) $3->type->castTo(tempType);
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
@@ -397,6 +405,8 @@ relational_expression
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
+        if (tempType->base != $1->type->base) $1->type->castTo(tempType);
+        if (tempType->base != $3->type->base) $3->type->castTo(tempType);
 
         expAst* temp = $1;
     	($$) = new op();
@@ -414,6 +424,8 @@ relational_expression
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
+        if (tempType->base != $1->type->base) $1->type->castTo(tempType);
+        if (tempType->base != $3->type->base) $3->type->castTo(tempType);
 
         expAst* temp = $1;
     	($$) = new op();
@@ -431,6 +443,8 @@ relational_expression
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
+        if (tempType->base != $1->type->base) $1->type->castTo(tempType);
+        if (tempType->base != $3->type->base) $3->type->castTo(tempType);
 
         expAst* temp = $1;
     	($$) = new op();
@@ -455,6 +469,8 @@ additive_expression
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
+        if (tempType->base != $1->type->base) $1->type->castTo(tempType);
+        if (tempType->base != $3->type->base) $3->type->castTo(tempType);
 
         expAst* temp = $1;
     	($$) = new op();
@@ -472,6 +488,8 @@ additive_expression
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
+        if (tempType->base != $1->type->base) $1->type->castTo(tempType);
+        if (tempType->base != $3->type->base) $3->type->castTo(tempType);
 
         expAst* temp = $1;
     	($$) = new op();
@@ -496,6 +514,8 @@ multiplicative_expression
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
+        if (tempType->base != $1->type->base) $1->type->castTo(tempType);
+        if (tempType->base != $3->type->base) $3->type->castTo(tempType);
 
         expAst* temp = $1;
     	($$) = new op();
@@ -513,6 +533,8 @@ multiplicative_expression
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         };
+        if (tempType->base != $1->type->base) $1->type->castTo(tempType);
+        if (tempType->base != $3->type->base) $3->type->castTo(tempType);
 
         expAst* temp = $1;
     	($$) = new op();
@@ -612,6 +634,11 @@ primary_expression
             cout<<" at line number "<<lineCount<<endl;
             exit(0);
         }
+
+        if ($1->type->base != $3->type->base){
+            $3->type->castTo($1->type);
+        }
+
         expAst* temp = $1;
     	($$) = new op();
     	((op*)$$)->exp1 = temp;
@@ -655,8 +682,9 @@ l_expression
             exit(0);
         }
         else{
-            $$->type = temp->type;
+            $$->type = copyType(temp->type);
         }
+        ((identifier*)$$)->var = temp;
     }
     | l_expression '[' expression ']'
     {

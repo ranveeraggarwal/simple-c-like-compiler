@@ -4,11 +4,15 @@
 #include <fstream>
 using namespace std;
 
+extern string typeArray[3];
 struct Type{
 	int size;
 	int base;
 	Type* child;
-	Type(){size = -1; child=NULL;}
+	bool isCasted;
+	int cast;
+
+	Type(){size = -1; child=NULL; isCasted = 0;}
 	Type(int tp){
 		child = NULL;
 		switch(tp){
@@ -25,11 +29,17 @@ struct Type{
 				base = 2;
 				break;
 		}
+		isCasted = 0;
 	}
 	Type(Type* c,int s){
 		child = c;
 		size = s;
-		
+		isCasted = 0;
+	}
+
+	void castTo(Type* type){
+		isCasted = 1;
+		cast = type->base;
 	}
 
 	void print(){
@@ -38,9 +48,16 @@ struct Type{
 				child->print();
 			cout<<")";
 		}
-		else if(base == 0) cout<<"void";
-		else if(base == 1) cout<<"int";
-		else if(base == 2) cout<<"float";
+		else{
+			if (isCasted){
+			cout<<" (to_"<<typeArray[cast]<<") ";
+			}
+			if(base == 0) cout<<"void";
+			if(base == 1) cout<<"int";
+			if(base == 2) cout<<"float";
+		}
+		
+		
 	}
 };
 

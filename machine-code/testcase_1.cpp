@@ -1,18 +1,20 @@
 int abc(int i){
 	int a;
 	a = 0;
+	return 5.3;
 }
 
 void func(){
-	void d;
-	int a,b;
+	int a;
+	float d;
 	int c[2][2];
-	c[1][2] = c[1][2];
-	printf("Hello World");
-	abc(a);
+	if (a < d) a = 0;
+	else a = a;
+	a = 10;
+	c[2][c[1][2]] = 1;
 }
 
-int main(int a, int b)
+int main()
 {
 	int j,k;
 	k = abc(k);

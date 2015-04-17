@@ -5,21 +5,13 @@
 #include "ast.h"
 using namespace std;
 
-class Register
-{
-public:
-	string name;
-};
-
-class Code{
-
-};
-
 class abstract_astnode
 {
 public:
+	Type* type;
 	virtual void print () = 0;
 	//virtual std::string generate_code(const symbolTable&) = 0;
+	void generate_code();
 	//virtual basic_types getType() = 0;
 	//virtual bool checkTypeofAST() = 0;
 protected:
@@ -31,9 +23,16 @@ private:
 class expAst: public abstract_astnode
 {
 public:
-	Type* type;
+	InstrList *truelist, *falselist, *nextlist;
+	bool fallthrough;
+
 	virtual void print() = 0;
-	expAst(){}
+	expAst(){
+		fallthrough = false;
+		truelist = new InstrList();
+		falselist = new InstrList();
+		nextlist = new InstrList();
+	}
 	
 };
 
@@ -48,6 +47,7 @@ public:
 class stmtAst: public abstract_astnode
 {
 public:
+	InstrList* nextlist;
 	virtual void print() = 0;
 	stmtAst(){}
 	
@@ -128,6 +128,8 @@ public:
 	void print()
 	{
 		cout<<"(";
+		type->print();
+		cout<<" ";
 		cout << fun_name;
 		expList->print();
 		cout<<")";
@@ -159,6 +161,9 @@ public:
 
 	void print()
 	{
+		cout<<"(";
+		type->print();
+		cout<<") ";
 		cout << "(FloatConst \"";
 		cout << value;
 		cout << "\")";
@@ -174,6 +179,9 @@ public:
 
 	void print()
 	{
+		cout<<"(";
+		type->print();
+		cout<<") ";
 		cout << "(IntConst \"";
 		cout << value;
 		cout << "\")" ;
@@ -204,6 +212,9 @@ public:
 
 	void print()
 	{
+		cout<<"(";
+		type->print();
+		cout<<") ";
 		cout << "(Id \"";
 		cout << value;
 		cout << "\")";
@@ -214,11 +225,25 @@ class identifier: public arrayRef
 {
 public:
 	string value;
+	Variable* var;
 	identifier(){}
-	
+	void generate_code(){
+		if (type->base == 1){
+	    Register* top = registers.top();
+	    instructions.push_back(new Instruction("loadi", value, top->name));
+		}
+		else if (type->base == 2){
+		    
+		    Register* top = registers.top();
+		    instructions.push_back(new Instruction("loadf", value, top->name));  
+		}
+	}
 
 	void print()
 	{
+		cout<<"(";
+		type->print();
+		cout<<") ";
 		cout << "(Id \"";
 		cout << value;
 		cout << "\")";
@@ -274,12 +299,8 @@ public:
 		else
 		{
 			cout << "(Ass (";
-			exp1->type->print();
-			cout<<" ";
 			exp1->print();
 			cout<<") (";
-			exp2->type->print();
-			cout<<" ";
 			exp2->print();
 			cout << "))";
 		}
@@ -327,6 +348,20 @@ public:
 	expAst *exp;
 	stmtAst *stmt;
 	while_stmt(){}
+
+	void generate_code(){
+	  exp->fallthrough = true;
+	  int expM = instructions.size();
+	  exp->generate_code();
+	  int stmtM = instructions.size();
+	  stmt->generate_code();
+	  (exp->truelist)->backpatch(instructions[expM]);
+	  (exp->nextlist)->backpatch(instructions[stmtM]);
+	  nextlist = exp->falselist;
+	  Instruction* code = new Instruction("jl");
+	  instructions.push_back(code);
+	  code->backpatch(instructions[expM]);
+	}
 	
 
 	void print(){
@@ -345,6 +380,22 @@ public:
 	stmtAst *stmt;
 	for_stmt(){}
 	
+	void generate_code(){
+		exp2->fallthrough = 1;
+		exp1->generate_code();
+		int exp2M = instructions.size();
+		exp2->generate_code();
+		int stmtM = instructions.size();
+		stmt->generate_code();
+		int exp3M = instructions.size();
+		exp3->generate_code();
+		Instruction* code = new Instruction("jl");
+		instructions.push_back(code);
+		(exp2->truelist)->backpatch(instructions[stmtM]);
+		(stmt->nextlist)->backpatch(instructions[exp3M]);
+		code->backpatch(instructions[exp2M]);
+		nextlist = exp2->falselist;
+	}
 
 	void print(){
 		cout << "(For ";
@@ -358,4 +409,3 @@ public:
 		cout << ")";
 	}
 };
-
