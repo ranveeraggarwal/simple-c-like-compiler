@@ -1,6 +1,7 @@
 #include "ast.h"
+#include <map>
 
-
+map<string,string> fallThrough;
 int labelNumber = 0;
 
 stack<Register*> registers;
