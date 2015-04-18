@@ -61,6 +61,42 @@ public:
 	bool optype;
 	op(){}
 	
+	void generate_code()
+	{
+		if (optype == 0)
+		{
+			if (opcode == "++")
+			{
+				if (type->base == 1)
+				{
+					Register* top = registers.top();
+					instructions.push_back(new Instruction("addi", "1", top->name));
+				}
+				else if (type->base == 2)
+				{
+					Register* top = registers.top();
+					instructions.push_back(new Instruction("addf", "1", top->name));
+				}
+			}
+			else if (opcode == "-")
+			{
+				if (type->base == 1)
+				{
+					Register* top = registers.top();
+					instructions.push_back(new Instruction("muli", "-1", top->name));
+				}
+				else if (type->base == 2)
+				{
+					Register* top = registers.top();
+					instructions.push_back(new Instruction("mulf", "-1", top->name));
+				}
+			}
+		}
+		else
+		{
+			
+		}
+	}
 
 	void print()
 	{
@@ -233,7 +269,6 @@ public:
 	    instructions.push_back(new Instruction("loadi", value, top->name));
 		}
 		else if (type->base == 2){
-		    
 		    Register* top = registers.top();
 		    instructions.push_back(new Instruction("loadf", value, top->name));  
 		}
