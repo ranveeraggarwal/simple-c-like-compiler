@@ -311,8 +311,25 @@ class return_stmt: public stmtAst
 {
 public:
 	expAst *exp;
+	int offset;
 	return_stmt(){}
 	
+	void generate_code(){
+		if (exp->type->base == 1) { //expression is of type int
+			if (dynamic_cast<IntConst*>(exp) != 0){
+				int temp = ((IntConst*)exp)->val;
+				instructions.push_back(new Instruction("storei", to_string(temp), "ind(ebp," + to_string(offset) + ")"));
+			}
+			else {
+				exp->generate_code();
+			    Register* reg = registers.top();
+			    codeStack.push_back(new Instr("storei", reg->name, "ind(ebp, "  + to_string(offset) + ")"));
+			}
+		}
+		else { //float
+
+		}
+	}
 
 	void print()
 	{
@@ -328,6 +345,22 @@ public:
 	expAst *exp;
 	stmtAst *stmt1, *stmt2;
 	if_stmt(){}
+
+	void generate_code(){
+	  exp->fallthrough = 1;               // expression.fall = 1
+	  exp->generate_code();      
+	  int stmt1M = instructions.size();
+	  stmt1->generate_code();
+	  Instruction* code = new Instruction("jl");
+	  instructions.push_back(code);
+	  nextlist->instrList.push_back(code);
+	  int stmt2M = instructions.size();
+	  stmt2->generate_code();
+	  (exp->truelist)->backpatch(instructions[stmt1M]);
+	  (exp->falselist)->backpatch(instructions[stmt2M]);
+	  nextlist->merge(stmt1->nextlist);
+	  nextlist->merge(stmt2->nextlist);
+	}
 	
 
 	void print()

@@ -54,6 +54,10 @@ public:
 			instrList[i]->backpatch(instr);
 		}
 	}
+
+	void merge(InstrList* instList){
+		this->instrList.insert(this->instrList.end(), instList->instrList.begin(), instList->instrList.end());
+	}
 };
 
 
