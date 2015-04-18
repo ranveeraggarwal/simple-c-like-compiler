@@ -239,7 +239,7 @@ statement
 		$$ = new return_stmt();
 		((return_stmt*)$$)->exp = ($<ExpAst>2);
         int tempOffset = 0;
-        for (int i=0; i< currentLst->params; i++){
+        for (int i=0; i< currentLst->params.size(); i++){
             int size = currentLst->params[i]->size;
             tempOffset += size;
         }

@@ -316,14 +316,14 @@ public:
 	
 	void generate_code(){
 		if (exp->type->base == 1) { //expression is of type int
-			if (dynamic_cast<IntConst*>(exp) != 0){
-				int temp = ((IntConst*)exp)->val;
+			if (int_constant* i = dynamic_cast<int_constant*>(exp)){
+				int temp = ((int_constant*)exp)->value;
 				instructions.push_back(new Instruction("storei", to_string(temp), "ind(ebp," + to_string(offset) + ")"));
 			}
 			else {
 				exp->generate_code();
 			    Register* reg = registers.top();
-			    codeStack.push_back(new Instr("storei", reg->name, "ind(ebp, "  + to_string(offset) + ")"));
+			    instructions.push_back(new Instruction("storei", reg->name, "ind(ebp, "  + to_string(offset) + ")"));
 			}
 		}
 		else { //float
