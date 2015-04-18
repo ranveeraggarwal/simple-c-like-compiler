@@ -67,26 +67,30 @@ public:
 		{
 			if (opcode == "++")
 			{
-				if (type->base == 1)
+				if (exp1->type->base == 1)
 				{
+					exp1->generate_code();
 					Register* top = registers.top();
 					instructions.push_back(new Instruction("addi", "1", top->name));
 				}
-				else if (type->base == 2)
+				else if (exp1->type->base == 2)
 				{
+					exp1->generate_code();
 					Register* top = registers.top();
 					instructions.push_back(new Instruction("addf", "1", top->name));
 				}
 			}
 			else if (opcode == "-")
 			{
-				if (type->base == 1)
+				if (exp1->type->base == 1)
 				{
+					exp1->generate_code();
 					Register* top = registers.top();
 					instructions.push_back(new Instruction("muli", "-1", top->name));
 				}
-				else if (type->base == 2)
+				else if (exp1->type->base == 2)
 				{
+					exp1->generate_code();
 					Register* top = registers.top();
 					instructions.push_back(new Instruction("mulf", "-1", top->name));
 				}
@@ -94,6 +98,29 @@ public:
 		}
 		else
 		{
+			if (opcode == "||"){
+				exp1->fallthrough = false;
+			    exp2->fallthrough = fallthrough;
+			    exp1->generate_code();
+			    int exp2M = instructions.size();
+			    exp2->generate_code();
+			    (exp1->falselist)->backpatch(instructions[exp2M]);
+			    truelist->merge(exp1->truelist);
+			    truelist->merge(exp2->truelist);
+			    falselist = exp2->falselist;
+			}
+
+			if (opcode == "&&"){
+				exp1->fallthrough = true;
+			    exp2->fallthrough = fallthrough;
+			    exp1->generate_code();
+			    int exp2M = instructions.size();
+			    exp2->generate_code();
+			    (exp1->truelist)->backpatch(instructions[exp2M]);
+			    falselist->merge(exp1->falselist);
+			    falselist->merge(exp2->falselist);
+			    truelist = exp2->truelist;
+			}
 			
 		}
 	}
