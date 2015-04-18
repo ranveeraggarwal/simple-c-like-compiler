@@ -327,7 +327,15 @@ public:
 			}
 		}
 		else { //float
-
+			if (float_constant* i = dynamic_cast<float_constant*>(exp)){
+				int temp = ((float_constant*)exp)->value;
+				instructions.push_back(new Instruction("storef", to_string(temp), "ind(ebp," + to_string(offset) + ")"));
+			}
+			else {
+				exp->generate_code();
+			    Register* reg = registers.top();
+			    instructions.push_back(new Instruction("storef", reg->name, "ind(ebp, "  + to_string(offset) + ")"));
+			}
 		}
 	}
 
