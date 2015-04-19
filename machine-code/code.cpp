@@ -34,3 +34,36 @@ void swapRegisters(){
     registers.push(second);
   }
 }
+
+	
+string fallthrouhinstr(string op){
+  if (op == "<")
+    return "jge";
+  else if (op == ">")
+    return "jle";
+  else if (op == "<=")
+    return "jl";
+  else if (op == ">=")
+    return "jg";
+  else if (op == "==")
+    return "jne";
+  else if (op == "!=")
+    return "je";
+  else return "j";
+}
+
+string notfallthrouhinstr(string op){
+  if (op == "<")
+    return "jl";
+  else if (op == ">")
+    return "jg";
+  else if (op == ">=")
+    return "jge";
+  else if (op == "<=")
+    return "jle";
+  else if (op == "==")
+    return "je";
+  else if (op == "!=")
+    return "jne";
+  else return "j";
+}

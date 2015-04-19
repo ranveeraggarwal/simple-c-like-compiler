@@ -6,6 +6,9 @@ using namespace std;
 
 string nextLabel();
 
+string fallthroughinstr(string);
+string notfallthroughinstr(string);
+
 class Register
 {
 public:

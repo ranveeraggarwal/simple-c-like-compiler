@@ -36,6 +36,24 @@ public:
 	
 };
 
+class int_constant: public expAst
+{
+public:
+	int value;
+	int_constant(){}
+	
+
+	void print()
+	{
+		cout<<"(";
+		type->print();
+		cout<<") ";
+		cout << "(IntConst \"";
+		cout << value;
+		cout << "\")" ;
+	}
+};
+
 class arrayRef: public expAst
 {
 public:
@@ -120,6 +138,190 @@ public:
 			    falselist->merge(exp1->falselist);
 			    falselist->merge(exp2->falselist);
 			    truelist = exp2->truelist;
+			}
+
+			else{
+				if (exp1->type->base == 1 && exp2->type->base == 1){
+					bool isExp1Const = false;
+					int_constant* tempI1;
+					if (tempI1 = dynamic_cast<int_constant*>(exp1)){
+						isExp1Const = true;
+					}
+					bool isExp2Const = false;
+					int_constant* tempI2;
+					if (tempI2 = dynamic_cast<int_constant*>(exp2)) isExp2Const = true;
+					if (isExp1Const && isExp2Const){
+						int exp1val = tempI1->value;
+						int exp2val = tempI2->value;
+
+						Register* top = registers.top();
+						if (opcode == "+"){
+							instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
+							instructions.push_back(new Instruction("addi", to_string(exp2val), top->name));
+						}
+
+						else if (opcode == "-"){
+							exp2val *= -1;
+							instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
+							instructions.push_back(new Instruction("addi", to_string(exp2val), top->name));
+						}
+
+						else if (opcode == "*"){
+							instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
+							instructions.push_back(new Instruction("muli", to_string(exp2val), top->name));
+						}
+
+						else if (opcode == "/"){
+							instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
+							instructions.push_back(new Instruction("divi", to_string(exp2val), top->name));
+						}
+
+						else if (opcode == "<" || opcode == ">" || opcode == "<=" 
+							|| opcode == ">=" || opcode == "==" || opcode == "!="){
+							instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
+							instructions.push_back(new Instruction("compi", to_string(exp2val), top->name));
+
+							if (fallthrough){
+								Instruction* code = new Instruction(fallthroughinstr(opcode));
+								instructions.push_back(code);
+								falselist->instrList.push_back(code);
+							}
+							else{
+								Instruction* code = new Instruction(notfallthroughinstr(opcode));
+								instructions.push_back(code);
+								truelist->instrList.push_back(code);
+							}
+						}
+					}
+					else if (isExp2Const || isExp1Const){
+						expAst* constant_exp;
+						expAst* nonconstant_exp;
+						if (isExp1Const){
+							constant_exp = exp1;
+							nonconstant_exp = exp2;
+						}
+						else {
+							constant_exp = exp2;
+							nonconstant_exp = exp1;
+						}
+						nonconstant_exp->generate_code();
+						int val = ((int_constant*)constant_exp)->value;
+						Register* top = registers.top();
+						string regName = top->name;
+						if (opcode == "+"){
+							instructions.push_back(new Instruction("addi", to_string(val), regName));
+						}
+						else if (opcode == "*"){
+							instructions.push_back(new Instruction("muli", to_string(val), regName));
+						}
+						else if (opcode == "-"){
+							instructions.push_back(new Instruction("muli", to_string(-1), regName));
+							instructions.push_back(new Instruction("addi", to_string(val), regName));
+
+							if (constant_exp == exp2){
+								instructions.push_back(new Instruction("muli", to_string(-1), regName));
+							}
+						}
+						else if (opcode == "/"){
+							if (constant_exp == exp1){
+								instructions.push_back(new Instruction("divi", to_string(val), regName));
+							}
+							else {
+								registers.pop();
+								Register* top2 = registers.top();
+								instructions.push_back(new Instruction("movei", to_string(val), top2->name));
+								instructions.push_back(new Instruction("divi", regName, top2->name));
+								registers.pop();
+								registers.push(top);
+								registers.push(top2);
+							}
+						}
+						else if (opcode == "<" || opcode == ">" || opcode == "<=" 
+							|| opcode == ">=" || opcode == "==" || opcode == "!="){
+
+							registers.pop();
+							Register* top2 = registers.top();
+
+
+							instructions.push_back(new Instruction("movei", to_string(val), regName));
+							if (constant_exp == exp1){
+								instructions.push_back(new Instruction("compi", regName, top2->name));
+								registers.pop();
+								registers.push(top);
+								registers.push(top2);
+							}
+							else {
+								instructions.push_back(new Instruction("compi", top2->name, regName));
+								registers.push(top);
+							}
+
+							if (fallthrough){
+								Instruction* code = new Instruction(fallthroughinstr(opcode));
+								instructions.push_back(code);
+								falselist->instrList.push_back(code);
+							}
+							else{
+								Instruction* code = new Instruction(notfallthroughinstr(opcode));
+								instructions.push_back(code);
+								truelist->instrList.push_back(code);
+							}
+						}
+						else if (opcode == "="){
+							
+						}
+
+					}
+					else { // Both expressions are not constant
+						exp1->generate_code();
+						Register* top = registers.top();
+
+						instructions.push_back(new Instruction("pushi", top->name, ""));
+
+						exp2->generate_code();
+						top = registers.top();
+						string reg2Name = top->name;
+						registers.pop();
+						Register* top2 = registers.top();
+						string reg1Name = top2->name;
+
+						instructions.push_back(new Instruction("loadi", "ind(esp)", reg1Name));
+
+						if (opcode == "+"){
+							instructions.push_back(new Instruction("addi", reg1Name, reg2Name));
+						}
+						else if (opcode == "-"){
+							instructions.push_back(new Instruction("addi", reg2Name, reg1Name));
+							instructions.push_back(new Instruction("movei", "-1", reg2Name));
+							instructions.push_back(new Instruction("muli", reg1Name, reg2Name));
+						}
+						else if (opcode == "*"){
+							instructions.push_back(new Instruction("muli", reg1Name, reg2Name));
+						}
+						else if (opcode == "/"){
+							instructions.push_back(new Instruction("divi", reg1Name, reg2Name));
+						}
+
+						else if (opcode == "<" || opcode == ">" || opcode == "<=" 
+							|| opcode == ">=" || opcode == "==" || opcode == "!="){
+
+							instructions.push_back(new Instruction("cmpi", reg1Name, reg2Name));
+				
+							if (fallthrough){
+								Instruction* code = new Instruction(fallthroughinstr(opcode));
+								instructions.push_back(code);
+								falselist->instrList.push_back(code);
+							}
+							else{
+								Instruction* code = new Instruction(notfallthroughinstr(opcode));
+								instructions.push_back(code);
+								truelist->instrList.push_back(code);
+							}
+						}
+						registers.push(top);
+
+					}
+
+				} // HERE ends op for integer
 			}
 			
 		}
@@ -230,24 +432,6 @@ public:
 		cout << "(FloatConst \"";
 		cout << value;
 		cout << "\")";
-	}
-};
-
-class int_constant: public expAst
-{
-public:
-	int value;
-	int_constant(){}
-	
-
-	void print()
-	{
-		cout<<"(";
-		type->print();
-		cout<<") ";
-		cout << "(IntConst \"";
-		cout << value;
-		cout << "\")" ;
 	}
 };
 
