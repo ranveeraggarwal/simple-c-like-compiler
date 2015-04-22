@@ -1,4 +1,4 @@
-#include "ast.h"
+#include "ast_main.cpp"
 #include <map>
 
 map<string,string> fallThrough;

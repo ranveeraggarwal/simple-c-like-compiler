@@ -1,6 +1,6 @@
 all: clean lex.cc parse.cc main.cc Scanner.h Scannerbase.h Scanner.ih Parser.h Parserbase.h Parser.ih
 	./sedscript
-	g++   --std=c++0x lex.cc parse.cc main.cc code.cpp;
+	g++  --std=c++0x lex.cc parse.cc main.cc;
 	./a.out < testcase_1 > junk.scm;        
 
 lex.cc: lex.l Scanner.ih 

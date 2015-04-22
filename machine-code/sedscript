@@ -1,9 +1,14 @@
 #!/bin/sh
 
 sed -i '/include/a #include "Parserbase.h"' Scanner.ih;
-sed -i '/insert preincludes/a #include "ast_main.cpp"' Parserbase.h;
-sed -i '/insert preincludes/a #include "symbol_table.cpp"' Parserbase.h;
-sed -i '/include "Parser.h"/a #include "st_helper.cpp"' Parser.ih;
+
+sed -i '/insert preincludes/a #include "headers.cc"' Parserbase.h;
+sed -i '/include "Parser.h"/a #include "definitions.cpp"' Parser.ih;
+
+#sed -i '/insert preincludes/a #include "ast_main.cpp"' Parserbase.h;
+#sed -i '/insert preincludes/a #include "symbol_table.cpp"' Parserbase.h;
+#sed -i '/include "Parser.h"/a #include "st_helper.cpp"' Parser.ih;
+#sed -i '/include "Parser.h"/a #include "ast_main_ref.cpp"' Parser.ih;
 
 sed -i '\|STYPE__     d_val__;| d 
 ' Parserbase.h
