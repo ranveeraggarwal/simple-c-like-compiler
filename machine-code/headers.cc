@@ -77,6 +77,7 @@ public:
 
 	Instruction(string name, string first, string second);
 	Instruction(string name);
+	Instruction(string name, string first);
 	void setLabel();
 	void backpatch(Instruction* instr);
 };
@@ -180,9 +181,7 @@ public:
 	std::vector<stmtAst*> v;
 	block_ast(){};
 
-	void generate_code(){
-		
-	}
+	void generate_code();
 	
 	void print();
 };
@@ -335,9 +334,11 @@ public:
 	expAst *exp;
 	index(){}
 
-	void generate_code(){
-		
-	}	
+	void generate_code();
+
+	void generate_code_for_lhs();
+
+	void generate_code_helper();
 
 	void print()
 	{
@@ -373,9 +374,7 @@ public:
 	expAst *exp1, *exp2;
 	ass(){}
 
-	void generate_code(){
-		
-	}
+	void generate_code();
 	
 	void print()
 	{

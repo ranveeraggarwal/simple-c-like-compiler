@@ -265,6 +265,12 @@ Instruction::Instruction(string name){
 	this->name = name;
 }
 
+Instruction::Instruction(string name, string first){
+	this->name = name;
+	this->first = first;
+	this->second = "";
+}
+
 void Instruction::setLabel(){
 	if (isLabel) return;
 	name = nextLabel();
@@ -363,6 +369,78 @@ void op :: generate_code()
 		    falselist->merge(exp1->falselist);
 		    falselist->merge(exp2->falselist);
 		    truelist = exp2->truelist;
+		}
+
+		else if (opcode == "="){
+			if (exp1->type->base = 1 && exp2->type->base == 1){
+
+				bool isExp2Const = false;
+				int_constant* tempI2;
+				if (tempI2 = dynamic_cast<int_constant*>(exp2)) isExp2Const = true;
+
+				if (isExp2Const){
+
+					int val = tempI2->value;
+					if(identifier* id = dynamic_cast<identifier*> (exp1)){
+						// Left side is an identifier
+						int offset = id->var->offset;
+						Register* top = registers.top();
+						instructions.push_back(new Instruction("movei", to_string(val), top->name));
+						instructions.push_back(new Instruction("storei", top->name, "ind(ebp+"+to_string(offset)+")"));
+
+					}
+					else {
+						index* ind = dynamic_cast<index*> (exp1);
+						ind->generate_code_for_lhs();
+						Register* top = registers.top();
+						string topName = top->name;
+						instructions.push_back(new Instruction("storei", to_string(val), "ind("+topName+")"));
+						instructions.push_back(new Instruction("movei" , to_string(val), topName));
+					}
+				}
+				else {
+
+					if(identifier* id = dynamic_cast<identifier*> (exp1)){
+						// Left side is an identifier
+						exp2->generate_code();
+						Register* top = registers.top();
+						string topName = top->name;
+						int offset = id->var->offset;
+						instructions.push_back(new Instruction("storei", topName, "ind(ebp, " + to_string(offset) + ")"));
+
+					}
+					else {
+						index* ind = dynamic_cast<index*> (exp1);
+						exp2->generate_code();
+						Register* top = registers.top();
+						string topName = top->name;
+						instructions.push_back(new Instruction("pushi", topName));
+
+						swapRegisters();
+						ind->generate_code_for_lhs();
+						swapRegisters();
+
+						top = registers.top();
+						topName = top->name;
+
+						registers.pop();
+
+						instructions.push_back(new Instruction("loadi", "ind(esp)", topName));
+						instructions.push_back(new Instruction("popi", "1"));
+						Register* top2 = registers.top();
+
+						string top2Name = top2->name;
+
+						instructions.push_back(new Instruction("storei", topName, "ind("+ top2Name + ")"));
+
+						registers.push(top);
+					}
+
+				}
+			}
+			else {
+				//TODO for float with proper casting
+			}
 		}
 
 		else{
@@ -491,22 +569,6 @@ void op :: generate_code()
 							truelist->instrList.push_back(code);
 						}
 					}
-					else if (opcode == "="){
-						/*
-						if(identifier* id = dynamic_cast<identifier*> (exp1)){
-							// Left side is an identifier
-							int offset = exp1->var->offset;
-							Register* top = registers->top();
-							instructions.push_back(new Instruction("movei", to_string(val), top->name));
-							instructions.push_back(new Instruction("storei", top->name, "ind(ebp+"+to_string(offset)+")"));
-
-						}
-						else {
-							index* ind = dynamic_cast<index*> (exp1);
-
-						}
-						*/
-					}
 
 				}
 				else { // Both expressions are not constant
@@ -555,11 +617,15 @@ void op :: generate_code()
 							truelist->instrList.push_back(code);
 						}
 					}
+					
 					registers.push(top);
 
 				}
 
 			} // HERE ends op for integer
+			else {
+				//TODO :: for float with proper casting 
+			}
 		}
 		
 	}
@@ -678,3 +744,90 @@ void for_stmt::generate_code(){
 	code->backpatch(instructions[exp2M]);
 	nextlist = exp2->falselist;
 }
+
+void index::generate_code_helper(){
+	if (identifier* id = dynamic_cast<identifier*>(arr)){
+		//LHS is an identifier
+		swapRegisters();
+		exp->generate_code();
+		Register* top = registers.top();
+		string name = top->name;
+		instructions.push_back(new Instruction("muli", to_string(type->size), name));
+		swapRegisters();
+
+		top = registers.top();
+		instructions.push_back(new Instruction("loadi", to_string(id->var->offset), top->name));
+
+	}
+	else {
+		index* ind = dynamic_cast<index*> (arr);
+		ind->generate_code_helper();
+		Register* top = registers.top();
+		instructions.push_back(new Instruction("pushi", top->name));
+
+		swapRegisters();
+		exp->generate_code();
+		Register* top2 = registers.top();
+		string top2Name = top2->name;
+		swapRegisters();
+		top = registers.top();
+		registers.pop();
+		string topName = top->name;
+		instructions.push_back(new Instruction("loadi", "ind(esp)", topName));
+		instructions.push_back(new Instruction("popi", "1"));
+
+		int size = type->size;
+		instructions.push_back(new Instruction("muli", to_string(size), top2Name));
+		instructions.push_back(new Instruction("addi", top2Name, topName));
+		registers.push(top);
+			
+	}
+}
+
+void index::generate_code(){
+	generate_code_helper();
+	Register* top = registers.top();
+
+	if (type->base == 1){
+		instructions.push_back(new Instruction("loadi", "ind(" + top->name + ")", top->name));
+	}
+	else {
+		instructions.push_back(new Instruction("loadf", "ind(" + top->name + ")", top->name));
+	}
+}
+
+void index::generate_code_for_lhs(){
+	generate_code_helper();
+	Register* top = registers.top();
+	string name = top->name;
+	//TODO: which instruction
+}
+
+
+void block_ast::generate_code(){
+	int l = v.size();
+	if (l > 0){
+		v[0]->generate_code();
+
+		for (int i = 1; i < l; i++){
+			int M = instructions.size();
+			v[i]->generate_code();
+			(v[i - 1]->nextlist)->backpatch(instructions[M]);
+		}
+
+		nextlist = v[l - 1]->nextlist;
+	}
+}
+
+void ass::generate_code(){
+	op* temp = new op();
+	temp->exp1 = exp1;
+	temp->exp2 = exp2;
+	temp->opcode = "=";
+	temp->optype = "1";
+	temp->generate_code();
+}
+
+/*
+For ranveer: generate code for float constant, int constant and try for funcall
+*/
