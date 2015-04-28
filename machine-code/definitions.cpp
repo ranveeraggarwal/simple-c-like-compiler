@@ -462,23 +462,52 @@ void op :: generate_code()
 		}
 
 		else{
-			if (exp1->type->base == 1 && exp2->type->base == 1){
+			if ((exp1->type->base == 1 && exp2->type->base == 1) || (exp1->type->base == 2 && exp2->type->base == 2)){
 				bool isExp1Const = false;
+				string instrType;
+				if (exp1->type->base == 1) instrType = "i";
+				else instrType = "f";
+
 				int_constant* tempI1;
-				if (tempI1 = dynamic_cast<int_constant*>(exp1)){
-					isExp1Const = true;
+				float_constant* tempI1f;
+
+				if (instrType == "i"){
+					if (tempI1 = dynamic_cast<int_constant*>(exp1)){
+						isExp1Const = true;
+					}
 				}
+				else {
+					if (tempI1f = dynamic_cast<float_constant*>(exp1)){
+						isExp1Const = true;
+					}
+				}
+
 				bool isExp2Const = false;
 				int_constant* tempI2;
-				if (tempI2 = dynamic_cast<int_constant*>(exp2)) isExp2Const = true;
+				float_constant* tempI2f;
+
+				if (instrType == "i"){
+					if (tempI2 = dynamic_cast<int_constant*>(exp2)) isExp2Const = true;
+				}
+				else {
+					if (tempI2f = dynamic_cast<float_constant*>(exp2)) isExp2Const = true;
+				}
+
 				if (isExp1Const && isExp2Const){
-					int exp1val = tempI1->value;
-					int exp2val = tempI2->value;
+					string val1, val2;
+					if (instrType == "i"){
+						val1 = to_string(tempI1->value);
+						val2 = to_string(tempI2->value);
+					}
+					else {
+						val1 = to_string(tempI1f->value);
+						val2 = to_string(tempI2f->value);
+					}
 
 					Register* top = registers.top();
 					if (opcode == "+"){
-						instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
-						instructions.push_back(new Instruction("addi", to_string(exp2val), top->name));
+						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("add" + instrType, val2, top->name));
 					}
 
 					else if (opcode == "-"){
