@@ -37,6 +37,9 @@ Type* arithmetic_check(Type* first, Type* second){
 }
 
 Type* compatibility_check(Type* first , Type* second){
+	//cerr<<"comp check"<<endl;
+	//cerr<<"first: "<<first->base<<endl;
+	//cerr<<"second: "<<second->base<<endl;
 	if(first->base == 2 && (second->base == 2 || second->base == 1))
 		return first;
 	if(first->base == 1 && (second->base == 2 || second->base == 1))
@@ -65,13 +68,14 @@ stack<Register*> registers;
 vector<Instruction*> instructions;
 
 void initializeStack(){
-	registers.push(new Register("eax"));
-	registers.push(new Register("ebx"));
-	registers.push(new Register("ecx"));
+	registers.push(new Register("esi"));
+	registers.push(new Register("edi"));
 	registers.push(new Register("edx"));
-	registers.push(new Register("eex"));
-	registers.push(new Register("efx"));
-	cerr<<"Init Regis:"<<registers.top()->name<<endl;
+	registers.push(new Register("ecx"));
+	registers.push(new Register("ebx"));
+	registers.push(new Register("eax"));
+	
+	//cerr<<"Init Regis:"<<registers.top()->name<<endl;
 }
 
 
@@ -290,6 +294,11 @@ void Instruction::backpatch(Instruction* instr){
 
 void Instruction::print(){
 
+	if (isReturn){
+		cout<<"\treturn;"<<endl;
+		return;
+	}
+
 	if (isFunctionStart){
 		cout<<"void "<<name<<"() {"<<endl;
 		return;
@@ -305,10 +314,10 @@ void Instruction::print(){
 	}
 
 	if (second == ""){
-		cout<<"\t"<<name<<"("<<first<<")"<<endl;
+		cout<<"\t"<<name<<"("<<first<<");"<<endl;
 	}
 	else {
-		cout<<"\t"<<name<<"("<<first<<","<<second<<")"<<endl;
+		cout<<"\t"<<name<<"("<<first<<","<<second<<");"<<endl;
 	}
 }
 
@@ -344,6 +353,7 @@ void int_constant::print()
 
 void op::generate_code()
 {
+	//cerr<<"opcode: "<<optype<<endl;
 	if (optype == 0)
 	{
 		if (opcode == "++")
@@ -353,12 +363,31 @@ void op::generate_code()
 				exp1->generate_code();
 				Register* top = registers.top();
 				instructions.push_back(new Instruction("addi", "1", top->name));
+				if (identifier* temp = dynamic_cast<identifier*>(exp1)){
+					int offset = temp->var->offset;
+					instructions.push_back(new Instruction("storei", top->name, "ind(ebp,"+to_string(offset)+")"));
+				}
+				else {
+					if(index* temp = dynamic_cast<index*>(exp1)){
+						int offset = ((identifier*)temp->arr)->var->offset;
+						instructions.push_back(new Instruction("storei", top->name, "ind(ebp,"+to_string(offset)+")"));
+					}
+				}
 			}
 			else if (exp1->type->base == 2)
 			{
 				exp1->generate_code();
 				Register* top = registers.top();
 				instructions.push_back(new Instruction("addf", "1", top->name));
+				if (identifier* temp = dynamic_cast<identifier*>(exp1)){
+					int offset = temp->var->offset;
+					instructions.push_back(new Instruction("storef", top->name, "ind(ebp,"+to_string(offset)+")"));
+				}
+				else if(index* temp = dynamic_cast<index*>(exp1)){
+					int offset = ((identifier*)temp->arr)->var->offset;
+					instructions.push_back(new Instruction("storef", top->name, "ind(ebp,"+to_string(offset)+")"));
+					
+				}
 			}
 		}
 		else if (opcode == "-")
@@ -368,12 +397,32 @@ void op::generate_code()
 				exp1->generate_code();
 				Register* top = registers.top();
 				instructions.push_back(new Instruction("muli", "-1", top->name));
+				if (identifier* temp = dynamic_cast<identifier*>(exp1)){
+					int offset = temp->var->offset;
+					instructions.push_back(new Instruction("storei", top->name, "ind(ebp,"+to_string(offset)+")"));
+				}
+				else {
+					if(index* temp = dynamic_cast<index*>(exp1)){
+						int offset = ((identifier*)temp->arr)->var->offset;
+						instructions.push_back(new Instruction("storef", top->name, "ind(ebp,"+to_string(offset)+")"));
+					}
+				}
 			}
 			else if (exp1->type->base == 2)
 			{
 				exp1->generate_code();
 				Register* top = registers.top();
 				instructions.push_back(new Instruction("mulf", "-1", top->name));
+				if (identifier* temp = dynamic_cast<identifier*>(exp1)){
+					int offset = temp->var->offset;
+					instructions.push_back(new Instruction("storef", top->name, "ind(ebp,"+to_string(offset)+")"));
+				}
+				else {
+					if(index* temp = dynamic_cast<index*>(exp1)){
+						int offset = ((identifier*)temp->arr)->var->offset;
+						instructions.push_back(new Instruction("storef", top->name, "ind(ebp,"+to_string(offset)+")"));
+					}
+				}
 			}
 		}
 	}
@@ -424,16 +473,18 @@ void op::generate_code()
 
 				if (isExp2Const){
 
+
+
 					string arg1;
 					if (instrType == "i") arg1 = to_string(tempI2i->value);
 					else arg1 = to_string(tempI2f->value);
-
+					//cerr<<"Arg for array: "<<arg1<<endl;
 
 					if(identifier* id = dynamic_cast<identifier*> (exp1)){
 						// Left side is an identifier
 						int offset = id->var->offset;
 						Register* top = registers.top();
-						cerr<<"Register top:"<<top->name<<endl;
+						////cerr<<"Register top:"<<top->name<<endl;
 						instructions.push_back(new Instruction("move", arg1, top->name));
 						instructions.push_back(new Instruction("store" + instrType, top->name, "ind(ebp,"+to_string(offset)+")"));
 
@@ -441,6 +492,7 @@ void op::generate_code()
 					else {
 						index* ind = dynamic_cast<index*> (exp1);
 						ind->generate_code_for_lhs();
+						//cerr<<"Here Arra"<<endl;
 						Register* top = registers.top();
 						
 						string topName = top->name;
@@ -489,12 +541,138 @@ void op::generate_code()
 				}
 			}
 			else {
+				//cerr<<"HERE for '='"<<endl;
+
 				//TODO for float with proper casting
+				string instrType;
+				if (exp1->type->base == 1) instrType = "i";
+				else instrType = "f";
+
+				//cerr << "HERE for '='"<<instrType<<endl;
+
+				bool isExp2Const = false;
+				
+				int_constant* tempI2i;
+				float_constant* tempI2f;
+				string exp2Type;
+
+				if (exp2->type->base == 2) exp2Type = "f";
+				else exp2Type = "i";
+
+				
+				if (tempI2i = dynamic_cast<int_constant*>(exp2)){
+					isExp2Const = true;
+				}
+				
+				
+				else if (tempI2f = dynamic_cast<float_constant*>(exp2)){
+					isExp2Const = true;
+				}
+				
+
+				if (isExp2Const){
+
+					string arg1;
+					if (exp2Type == "i") arg1 = to_string(tempI2i->value);
+					else arg1 = to_string(tempI2f->value);
+
+
+					if(identifier* id = dynamic_cast<identifier*> (exp1)){
+						// Left side is an identifier
+						int offset = id->var->offset;
+						Register* top = registers.top();
+						//cerr<<"Register top:"<<top->name<<endl;
+						instructions.push_back(new Instruction("move", arg1, top->name));
+						if (instrType == "f" && exp2Type == "i"){
+							instructions.push_back(new Instruction("intTofloat", top->name));
+						}
+						else if (instrType == "i" && exp2Type == "f"){
+							instructions.push_back(new Instruction("floatToint", top->name));
+						}
+						instructions.push_back(new Instruction("store" + instrType, top->name, "ind(ebp,"+to_string(offset)+")"));
+
+					}
+					else {
+						index* ind = dynamic_cast<index*> (exp1);
+						ind->generate_code_for_lhs();
+						Register* top = registers.top();
+						
+						string topName = top->name;
+						registers.pop();
+						Register* top2 = registers.top();
+
+						instructions.push_back(new Instruction("move", arg1, top2->name));
+
+						if (instrType == "f" && exp2Type == "i"){
+							instructions.push_back(new Instruction("intTofloat", top2->name));
+						}
+						else if (instrType == "i" && exp2Type == "f"){
+							instructions.push_back(new Instruction("floatToint", top2->name));
+						}
+
+						instructions.push_back(new Instruction("store" + instrType, top2->name, "ind("+topName+")"));
+						instructions.push_back(new Instruction("move" , top2->name, topName));
+						registers.push(top);
+					}
+				}
+				else {
+
+					if(identifier* id = dynamic_cast<identifier*> (exp1)){
+						// Left side is an identifier
+						exp2->generate_code();
+						Register* top = registers.top();
+						string topName = top->name;
+						int offset = id->var->offset;
+						if (exp2->type->base == 2 && exp1->type->base == 1){
+							instructions.push_back(new Instruction("floatToint", topName));
+						}
+						else if (exp2->type->base == 1 && exp1->type->base == 2){
+							instructions.push_back(new Instruction("intTofloat", topName));
+						}
+						instructions.push_back(new Instruction("store" + instrType, topName, "ind(ebp, " + to_string(offset) + ")"));
+
+					}
+					else {
+						index* ind = dynamic_cast<index*> (exp1);
+						exp2->generate_code();
+						Register* top = registers.top();
+						string topName = top->name;
+
+						if (exp2->type->base == 2 && exp1->type->base == 1){
+							instructions.push_back(new Instruction("floatToint", topName));
+						}
+						else if (exp2->type->base == 1 && exp1->type->base == 2){
+							instructions.push_back(new Instruction("intTofloat", topName));
+						}
+
+						instructions.push_back(new Instruction("push" + instrType, topName));
+
+						swapRegisters();
+						ind->generate_code_for_lhs();
+						swapRegisters();
+
+						top = registers.top();
+						topName = top->name;
+
+						registers.pop();
+
+						instructions.push_back(new Instruction("load" + instrType, "ind(esp)", topName));
+						instructions.push_back(new Instruction("pop" + instrType, "1"));
+						Register* top2 = registers.top();
+
+						string top2Name = top2->name;
+
+						instructions.push_back(new Instruction("store" + instrType, topName, "ind("+ top2Name + ")"));
+
+						registers.push(top);
+					}
+
+				}
 			}
 		}
 
 		else{
-			cerr<<"opcode: "<<opcode<<endl;
+			//cerr<<"opcode: "<<opcode<<endl;
 			if ((exp1->type->base == 1 && exp2->type->base == 1) || (exp1->type->base == 2 && exp2->type->base == 2)){
 				bool isExp1Const = false;
 				string instrType;
@@ -525,6 +703,8 @@ void op::generate_code()
 				else {
 					if (tempI2f = dynamic_cast<float_constant*>(exp2)) isExp2Const = true;
 				}
+
+				//cerr<<"Exp1: "<<isExp1Const<<" Exp2: "<<isExp2Const<<endl;
 
 				if (isExp1Const && isExp2Const){
 					string val1, val2;
@@ -562,7 +742,7 @@ void op::generate_code()
 					else if (opcode == "<" || opcode == ">" || opcode == "<=" 
 						|| opcode == ">=" || opcode == "==" || opcode == "!="){
 						instructions.push_back(new Instruction("move", val1, top->name));
-						instructions.push_back(new Instruction("comp" + instrType, val2, top->name));
+						instructions.push_back(new Instruction("cmp" + instrType, val2, top->name));
 
 						if (fallthrough){
 							Instruction* code = new Instruction(fallthroughinstr(opcode));
@@ -588,9 +768,11 @@ void op::generate_code()
 						nonconstant_exp = exp1;
 					}
 					nonconstant_exp->generate_code();
+					//cerr<<"code generated for nonconst"<<endl;
 					string val;
 					if(instrType == "i") val = to_string(((int_constant*)constant_exp)->value);
 					else val = to_string(((float_constant*)constant_exp)->value);
+					//cerr<<"Constant Value: "<<val<<endl;
 					Register* top = registers.top();
 					string regName = top->name;
 					if (opcode == "+"){
@@ -628,22 +810,28 @@ void op::generate_code()
 						Register* top2 = registers.top();
 
 
-						instructions.push_back(new Instruction("move", val, regName));
+						instructions.push_back(new Instruction("move", val, top2->name));
+
+						//cerr<<"Inside <"<<endl;
 						if (constant_exp == exp1){
-							instructions.push_back(new Instruction("comp" + instrType, regName, top2->name));
+							instructions.push_back(new Instruction("cmp" + instrType, regName, top2->name));
 							registers.pop();
 							registers.push(top);
 							registers.push(top2);
 						}
 						else {
-							instructions.push_back(new Instruction("comp" + instrType, top2->name, regName));
+							//cerr<<"coming inside exp2cnst"<<endl;
+							instructions.push_back(new Instruction("cmp" + instrType, regName, top2->name));
 							registers.push(top);
 						}
 
+						//cerr<<"fallthrough: "<<fallthrough<<endl;
 						if (fallthrough){
 							Instruction* code = new Instruction(fallthroughinstr(opcode));
+							//cerr<<code->name<<endl;
 							instructions.push_back(code);
 							falselist->instrList.push_back(code);
+							//cerr<<"Ab kaha hai?"<<endl;
 						}
 						else{
 							Instruction* code = new Instruction(notfallthroughinstr(opcode));
@@ -667,6 +855,7 @@ void op::generate_code()
 					string reg1Name = top2->name;
 
 					instructions.push_back(new Instruction("load" + instrType, "ind(esp)", reg1Name));
+					instructions.push_back(new Instruction("pop" + instrType, "1"));
 
 					if (opcode == "+"){
 						instructions.push_back(new Instruction("add" + instrType, reg1Name, reg2Name));
@@ -806,12 +995,12 @@ void op::generate_code()
 						instructions.push_back(new Instruction("move", val1, top->name));
 						if (isExp1Int){
 							instructions.push_back(new Instruction("intTofloat", top->name));
-							instructions.push_back(new Instruction("compf", val2, top->name));
+							instructions.push_back(new Instruction("cmpf", val2, top->name));
 						}
 						else {
 							instructions.push_back(new Instruction("move", val2, top2->name));
 							instructions.push_back(new Instruction("intTofloat", top2->name));
-							instructions.push_back(new Instruction("compf", top2->name, top->name));
+							instructions.push_back(new Instruction("cmpf", top2->name, top->name));
 						}
 
 						if (fallthrough){
@@ -926,13 +1115,13 @@ void op::generate_code()
 						instructions.push_back(new Instruction("move", val, regName));
 						if (isConstExpInt) instructions.push_back(new Instruction("intTofloat", regName));
 						if (constant_exp == exp1){
-							instructions.push_back(new Instruction("compf", regName, top2->name));
+							instructions.push_back(new Instruction("cmpf", regName, top2->name));
 							registers.pop();
 							registers.push(top);
 							registers.push(top2);
 						}
 						else {
-							instructions.push_back(new Instruction("compf", top2->name, regName));
+							instructions.push_back(new Instruction("cmpf", top2->name, regName));
 							registers.push(top);
 						}
 
@@ -1043,11 +1232,12 @@ void block_ast::print()
 void identifier::generate_code(){
 	if (type->base == 1){
     Register* top = registers.top();
-    instructions.push_back(new Instruction("loadi", "ind(ebp," + to_string(offset) + ")", top->name));
+    //cerr<<"identifier: "<<var->offset<<endl;
+    instructions.push_back(new Instruction("loadi", "ind(ebp," + to_string(var->offset) + ")", top->name));
 	}
 	else if (type->base == 2){
 	    Register* top = registers.top();
-	    instructions.push_back(new Instruction("loadf", "ind(ebp," + to_string(offset) + ")", top->name));  
+	    instructions.push_back(new Instruction("loadf", "ind(ebp," + to_string(var->offset) + ")", top->name));  
 	}
 }
 
@@ -1063,11 +1253,12 @@ void return_stmt::generate_code(){
 			int temp = ((int_constant*)exp)->value;
 			if (instrType == "f"){
 				Register* top = registers.top();
-				instructions.push_back(new Instruction("loadi", to_string(temp), top->name));
+				instructions.push_back(new Instruction("move", to_string(temp), top->name));
 				instructions.push_back(new Instruction("intTofloat", top->name));
 				instructions.push_back(new Instruction("storef", top->name, "ind(ebp,"+to_string(offset) + ")"));
 			}
 			else instructions.push_back(new Instruction("storei", to_string(temp), "ind(ebp," + to_string(offset) + ")"));
+
 		}
 		else {
 			exp->generate_code();
@@ -1081,7 +1272,7 @@ void return_stmt::generate_code(){
 			float temp = ((float_constant*)exp)->value;
 			if (instrType == "i"){
 				Register* top = registers.top();
-				instructions.push_back(new Instruction("loadf", to_string(temp), top->name));
+				instructions.push_back(new Instruction("move", to_string(temp), top->name));
 				instructions.push_back(new Instruction("floatToint", top->name));
 				instructions.push_back(new Instruction("storei", top->name, "ind(ebp,"+to_string(offset) + ")"));
 			}
@@ -1094,6 +1285,18 @@ void return_stmt::generate_code(){
 		    instructions.push_back(new Instruction("store" + instrType, reg->name, "ind(ebp, "  + to_string(offset) + ")"));
 		}
 	}
+
+	for (auto kv: lst->variables){
+		if (kv.second->scope == 2) continue;
+		instructions.push_back(new Instruction("addi", to_string(kv.second->size), "esp"));
+	}
+	instructions.push_back(new Instruction("popi", "1"));
+
+	Instruction* returnInstr = new Instruction();
+	returnInstr->name = "return";
+	returnInstr->isReturn = true;
+	instructions.push_back(returnInstr);
+
 }
 
 void if_stmt::generate_code(){
@@ -1129,10 +1332,17 @@ void while_stmt::generate_code(){
 void for_stmt::generate_code(){
 	exp2->fallthrough = 1;
 	exp1->generate_code();
+
 	int exp2M = instructions.size();
 	exp2->generate_code();
+	//cerr<<"exp2 generated"<<endl;
 	int stmtM = instructions.size();
+	//cerr<<"stmt code generation called"<<endl;
+	//stmt->print();
+	////cerr<<"stmt printed"<<endl;
+	////cerr<<stmt<<endl;
 	stmt->generate_code();
+	//cerr<<"stmt code generated"<<endl;
 	int exp3M = instructions.size();
 	exp3->generate_code();
 	Instruction* code = new Instruction("jl");
@@ -1154,7 +1364,7 @@ void index::generate_code_helper(){
 		swapRegisters();
 
 		top = registers.top();
-		instructions.push_back(new Instruction("loadi", to_string(id->var->offset), top->name));
+		instructions.push_back(new Instruction("loadi", "ind(ebp,"+to_string(id->var->offset)+")", top->name));
 
 	}
 	else {
@@ -1203,10 +1413,21 @@ void index::generate_code_for_lhs(){
 
 
 void block_ast::generate_code(){
-	Instruction* funcStart = new Instruction();
-	funcStart->name = lst->funcName;
-	funcStart->isFunctionStart = true;
-	instructions.push_back(funcStart);
+	//cerr<<"For Loop yaha aya"<<endl;
+	if (isFunction){
+		Instruction* funcStart = new Instruction();
+		funcStart->name = lst->funcName;
+		funcStart->isFunctionStart = true;
+		instructions.push_back(funcStart);
+
+		instructions.push_back(new Instruction("pushi", "ebp"));
+		instructions.push_back(new Instruction("move", "esp", "ebp"));
+
+		for (auto kv: lst->variables){
+			if (kv.second->scope == 2) continue;
+			instructions.push_back(new Instruction("addi", "-" + to_string(kv.second->size), "esp"));
+		}
+	}
 
 	int l = v.size();
 	if (l > 0){
@@ -1221,12 +1442,18 @@ void block_ast::generate_code(){
 		nextlist = v[l - 1]->nextlist;
 	}
 
-	Instruction* funEnd = new Instruction();
-	funEnd->isFunctionEnd = true;
-	instructions.push_back(funEnd);
+	if (isFunction){
+
+		//instructions.push_back(new Instruction("popi", "1"));
+
+		Instruction* funEnd = new Instruction();
+		funEnd->isFunctionEnd = true;
+		instructions.push_back(funEnd);
+	}
 }
 
 void ass::generate_code(){
+	//cerr<<"for ass"<<endl;
 	op* temp = new op();
 	temp->exp1 = exp1;
 	temp->exp2 = exp2;
@@ -1241,12 +1468,12 @@ For ranveer: generate code for float constant, int constant and try for funcall
 
 void float_constant::generate_code(){
 	Register* top = registers.top();
-	instructions.push_back(new Instruction("loadf", to_string(value), top->name));
+	instructions.push_back(new Instruction("move", to_string(value), top->name));
 }
 
 void int_constant::generate_code(){
 	Register* top = registers.top();
-	instructions.push_back(new Instruction("loadi", to_string(value), top->name));
+	instructions.push_back(new Instruction("move", to_string(value), top->name));
 }
 
 void  fun_call::generate_code(){
@@ -1306,7 +1533,7 @@ void  fun_call::generate_code(){
 				else {
 					if (int_constant* temp = dynamic_cast<int_constant*>(expList->v[i])){
 						Register* top = registers.top();
-						instructions.push_back(new Instruction("loadi", to_string(temp->value), top->name));
+						instructions.push_back(new Instruction("move", to_string(temp->value), top->name));
 						instructions.push_back(new Instruction("intTofloat", top->name));
 						instructions.push_back(new Instruction("pushi", top->name));
 					}
@@ -1332,7 +1559,7 @@ void  fun_call::generate_code(){
 				else {
 					if (float_constant* temp = dynamic_cast<float_constant*>(expList->v[i])){
 						Register* top = registers.top();
-						instructions.push_back(new Instruction("loadf", to_string(temp->value), top->name));
+						instructions.push_back(new Instruction("move", to_string(temp->value), top->name));
 						instructions.push_back(new Instruction("floatToint", top->name));
 						instructions.push_back(new Instruction("pushf", top->name));
 					}

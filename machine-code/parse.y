@@ -53,7 +53,9 @@ translation_unit
 		$$->print();
         cout<<endl;
         initializeStack();
+        //cerr<<"Gen code"<<endl;
         $$->generate_code();
+        //cerr<<"Non gen code"<<endl;
 	}
 	| translation_unit function_definition 
     {
@@ -70,6 +72,7 @@ function_definition
 		{
 			$$ = $3;
             scope = 0;
+            //cerr<<"Function Def Done"<<endl;
 		}
 	;
 
@@ -94,6 +97,7 @@ type_specifier
 fun_declarator
 	: IDENTIFIER '('
     {
+        //cerr << "Declared"<<endl;
         currentLst = new LocalSymbolTable($1);
         currentLst->returnType = type;
         gst->lstList.push_back(currentLst);
@@ -197,16 +201,19 @@ compound_statement
 		{
 			$$ = new block_ast();
             ((block_ast*)$$)->lst = currentLst;
+            ((block_ast*)$$)->isFunction = true;
 		}
 	| '{' statement_list '}' 
 		{
 			$$ = $2;
             ((block_ast*)$$)->lst = currentLst;
+            ((block_ast*)$$)->isFunction = true;
 		}
     | '{' declaration_list statement_list '}' 
     	{
     		$$ = $3;
             ((block_ast*)$$)->lst = currentLst;
+            ((block_ast*)$$)->isFunction = true;
     	}
 	;
 
@@ -296,18 +303,25 @@ assignment_statement
 	|  l_expression '=' expression ';'
 	{
 
-        cerr<<" here first"<<endl;
+        //cerr<<" here first"<<endl;
+        //cerr<<"1 type:" <<$1->type<<endl;
+        //cerr<<"3 type: "<<$3->type<<endl;
+
         Type* tempType = compatibility_check($1->type, $3->type);
+        ////cerr<<"here third"<<endl;
         if (tempType == 0){
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
             exit(0);
         }
+
+        //cerr<<"here second"<<endl;
         if (tempType->base != $1->type->base) $1->type->castTo(tempType);
         if (tempType->base != $3->type->base) $3->type->castTo(tempType);
 
 		$$ = new ass();
 		((ass*)$$)->exp1 = $1;
 		((ass*)$$)->exp2 = $3;
+        //cerr<<"Assign done"<<endl;
 
 
 	}	
@@ -538,7 +552,7 @@ multiplicative_expression
     }
 	| multiplicative_expression '*' unary_expression 
 	{
-        cerr<<"here later"<<endl;
+        //cerr<<"here later"<<endl;
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
@@ -634,6 +648,7 @@ postfix_expression
 
 	| l_expression INC_OP
 	{
+        //cerr<<"INC_OP"<<endl;
         if ($1->type->base == 0){
             cout<<"++ operator is not allowed on void type"<<" at line number "<<lineCount<<endl;
             exit(0);
@@ -644,7 +659,8 @@ postfix_expression
     	((op*)$$)->exp1 = temp;
     	((op*)$$)->opcode = "++";
     	((op*)$$)->optype = 0;
-        $$->type = $1->type;
+        ((op*)$$)->type = temp->type;
+        //cerr<<"INC_OP_DONE"<<endl;
     }
 	;
 
@@ -712,7 +728,10 @@ l_expression
             exit(0);
         }
         else{
-            $$->type = copyType(temp->type);
+            //cerr<<temp->type->base<<endl;
+            ((identifier*)$$)->type = copyType(temp->type);
+            //cerr<<copyType(temp->type)->base<<endl;
+            //cerr<<"identifier type"<<endl;
         }
         ((identifier*)$$)->var = temp;
     }

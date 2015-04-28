@@ -76,6 +76,7 @@ public:
 	bool isGoto;
 	bool isFunctionStart = false;
 	bool isFunctionEnd = false;
+	bool isReturn = false;
 
 	Instruction(){};
 
@@ -191,6 +192,7 @@ class block_ast: public stmtAst
 {
 public:
 	LocalSymbolTable* lst;
+	bool isFunction = false;
 	std::vector<stmtAst*> v;
 	block_ast(){
 		nextlist = new InstrList();
