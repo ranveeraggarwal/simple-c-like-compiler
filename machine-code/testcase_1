@@ -1,15 +1,16 @@
 int abc(int i){
-	int a;
+	float a;
 	int c,d,e,f,g,h;
 	a = 0;
 	a = c * d + g * g/ h;
+	return a;
 }
 
 void func(){
 	int d;
 	int a,b;
 	printf("Hello World");
-	abc(a);
+	d = abc(a);
 }
 
 int main(int a, int b)

@@ -8,6 +8,7 @@ GlobalSymbolTable* gst = new GlobalSymbolTable();
 LocalSymbolTable* currentLst = new LocalSymbolTable();
 LocalSymbolTable* currentLstCalled = new LocalSymbolTable();
 int paramCount = 0;
+bool paramDone = false;
 
 Type* copyType(Type* type){
 	Type *temp = new Type();
@@ -70,6 +71,7 @@ void initializeStack(){
 	registers.push(new Register("edx"));
 	registers.push(new Register("eex"));
 	registers.push(new Register("efx"));
+	cerr<<"Init Regis:"<<registers.top()->name<<endl;
 }
 
 
@@ -250,7 +252,7 @@ void GlobalSymbolTable::print(){
 }
 
 Register::Register(string name){
-		this->name;
+		this->name = name;
 	}
 
 Instruction::Instruction(string name, string first, string second){
@@ -263,23 +265,51 @@ Instruction::Instruction(string name, string first, string second){
 
 Instruction::Instruction(string name){
 	this->name = name;
+	isGoto = true;
+	isLabel = false;
 }
 
 Instruction::Instruction(string name, string first){
 	this->name = name;
 	this->first = first;
 	this->second = "";
+	isLabel = false;
+	isGoto = false;
 }
 
 void Instruction::setLabel(){
 	if (isLabel) return;
-	name = nextLabel();
+	label = nextLabel();
 	isLabel = true;
 }
 
 void Instruction::backpatch(Instruction* instr){
 	instr->setLabel();
-	name = instr->name;
+	first = instr->label;
+}
+
+void Instruction::print(){
+
+	if (isFunctionStart){
+		cout<<"void "<<name<<"() {"<<endl;
+		return;
+	}
+
+	if (isFunctionEnd){
+		cout<<"}\n"<<endl;
+		return;
+	}
+
+	if (isLabel){
+		cout<<label<<":"<<endl;
+	}
+
+	if (second == ""){
+		cout<<"\t"<<name<<"("<<first<<")"<<endl;
+	}
+	else {
+		cout<<"\t"<<name<<"("<<first<<","<<second<<")"<<endl;
+	}
 }
 
 void InstrList::backpatch(Instruction* instr){
@@ -288,9 +318,11 @@ void InstrList::backpatch(Instruction* instr){
 	}
 }
 
+
 void InstrList::merge(InstrList* instList){
 	this->instrList.insert(this->instrList.end(), instList->instrList.begin(), instList->instrList.end());
 }
+
 
 expAst::expAst(){
 	fallthrough = false;
@@ -310,7 +342,7 @@ void int_constant::print()
 }
 
 
-void op :: generate_code()
+void op::generate_code()
 {
 	if (optype == 0)
 	{
@@ -359,7 +391,7 @@ void op :: generate_code()
 		    falselist = exp2->falselist;
 		}
 
-		if (opcode == "&&"){
+		else if (opcode == "&&"){
 			exp1->fallthrough = true;
 		    exp2->fallthrough = fallthrough;
 		    exp1->generate_code();
@@ -401,9 +433,9 @@ void op :: generate_code()
 						// Left side is an identifier
 						int offset = id->var->offset;
 						Register* top = registers.top();
-
+						cerr<<"Register top:"<<top->name<<endl;
 						instructions.push_back(new Instruction("move", arg1, top->name));
-						instructions.push_back(new Instruction("store" + instrType, top->name, "ind(ebp+"+to_string(offset)+")"));
+						instructions.push_back(new Instruction("store" + instrType, top->name, "ind(ebp,"+to_string(offset)+")"));
 
 					}
 					else {
@@ -462,6 +494,7 @@ void op :: generate_code()
 		}
 
 		else{
+			cerr<<"opcode: "<<opcode<<endl;
 			if ((exp1->type->base == 1 && exp2->type->base == 1) || (exp1->type->base == 2 && exp2->type->base == 2)){
 				bool isExp1Const = false;
 				string instrType;
@@ -980,7 +1013,6 @@ void op :: generate_code()
 
 void op::print()
 {
-	cout << nextLabel();
 	if (!optype)
 	{
 		cout << "(" << opcode << " ";
@@ -1011,11 +1043,11 @@ void block_ast::print()
 void identifier::generate_code(){
 	if (type->base == 1){
     Register* top = registers.top();
-    instructions.push_back(new Instruction("loadi", value, top->name));
+    instructions.push_back(new Instruction("loadi", "ind(ebp," + to_string(offset) + ")", top->name));
 	}
 	else if (type->base == 2){
 	    Register* top = registers.top();
-	    instructions.push_back(new Instruction("loadf", value, top->name));  
+	    instructions.push_back(new Instruction("loadf", "ind(ebp," + to_string(offset) + ")", top->name));  
 	}
 }
 
@@ -1171,6 +1203,11 @@ void index::generate_code_for_lhs(){
 
 
 void block_ast::generate_code(){
+	Instruction* funcStart = new Instruction();
+	funcStart->name = lst->funcName;
+	funcStart->isFunctionStart = true;
+	instructions.push_back(funcStart);
+
 	int l = v.size();
 	if (l > 0){
 		v[0]->generate_code();
@@ -1183,6 +1220,10 @@ void block_ast::generate_code(){
 
 		nextlist = v[l - 1]->nextlist;
 	}
+
+	Instruction* funEnd = new Instruction();
+	funEnd->isFunctionEnd = true;
+	instructions.push_back(funEnd);
 }
 
 void ass::generate_code(){
@@ -1208,7 +1249,7 @@ void int_constant::generate_code(){
 	instructions.push_back(new Instruction("loadi", to_string(value), top->name));
 }
 
-void fun_call::generate_code(){
+void  fun_call::generate_code(){
 	if (fun_name == "printf"){
 		instructions.push_back(new Instruction("pushi", "0"));
 		for (auto exp: expList->v){

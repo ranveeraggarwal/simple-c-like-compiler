@@ -71,15 +71,21 @@ public:
 
 class Instruction{
 public:
-	string name, first, second;
+	string name, first, second, label;
 	bool isLabel;
 	bool isGoto;
+	bool isFunctionStart = false;
+	bool isFunctionEnd = false;
+
+	Instruction(){};
 
 	Instruction(string name, string first, string second);
 	Instruction(string name);
 	Instruction(string name, string first);
+	
 	void setLabel();
 	void backpatch(Instruction* instr);
+	void print();
 };
 
 class InstrList{
@@ -133,7 +139,12 @@ class int_constant: public expAst
 {
 public:
 	int value;
-	int_constant(){}
+
+	int_constant(){
+		truelist = new InstrList();
+		falselist = new InstrList();
+		nextlist = new InstrList();
+	}
 
 	void generate_code();
 	void print();
@@ -165,7 +176,11 @@ public:
 	expAst *exp1, *exp2;
 	string opcode;
 	bool optype;
-	op(){}
+	op(){
+		truelist = new InstrList();
+		falselist = new InstrList();
+		nextlist = new InstrList();
+	}
 
 	void  generate_code();
 
@@ -175,8 +190,11 @@ public:
 class block_ast: public stmtAst
 {
 public:
+	LocalSymbolTable* lst;
 	std::vector<stmtAst*> v;
-	block_ast(){};
+	block_ast(){
+		nextlist = new InstrList();
+	};
 
 	void generate_code();
 	
@@ -208,7 +226,11 @@ class fun_call: public expAst
 public:
 	string fun_name;
 	exp_list* expList;
-	fun_call(){}
+	fun_call(){
+		truelist = new InstrList();
+		falselist = new InstrList();
+		nextlist = new InstrList();
+	}
 
 	void generate_code();
 	
@@ -228,7 +250,9 @@ class fun_call_stmt: public stmtAst
 public:
 	string fun_name;
 	exp_list* expList;
-	fun_call_stmt(){}
+	fun_call_stmt(){
+		nextlist = new InstrList();
+	}
 
 	void generate_code();
 	
@@ -245,7 +269,11 @@ class float_constant: public expAst
 {
 public:
 	float value;
-	float_constant(){}
+	float_constant(){
+		truelist = new InstrList();
+		falselist = new InstrList();
+		nextlist = new InstrList();
+	}
 	
 	void generate_code();
 
@@ -264,7 +292,11 @@ class string_constant: public expAst
 {
 public:
 	string value;
-	string_constant(){}
+	string_constant(){
+		truelist = new InstrList();
+		falselist = new InstrList();
+		nextlist = new InstrList();
+	}
 	
 	void generate_code(){
 		
@@ -306,7 +338,11 @@ class identifier: public arrayRef
 public:
 	string value;
 	Variable* var;
-	identifier(){}
+	identifier(){
+		truelist = new InstrList();
+		falselist = new InstrList();
+		nextlist = new InstrList();
+	}
 	void generate_code();
 
 	void print()
@@ -325,7 +361,11 @@ class index: public arrayRef
 public:
 	arrayRef *arr;
 	expAst *exp;
-	index(){}
+	index(){
+		truelist = new InstrList();
+		falselist = new InstrList();
+		nextlist = new InstrList();
+	}
 
 	void generate_code();
 
@@ -367,7 +407,9 @@ class ass: public stmtAst
 {
 public:
 	expAst *exp1, *exp2;
-	ass(){}
+	ass(){
+		nextlist = new InstrList();
+	}
 
 	void generate_code();
 	
@@ -394,7 +436,9 @@ public:
 	expAst *exp;
 	int offset;
 	LocalSymbolTable* lst;
-	return_stmt(){}
+	return_stmt(){
+		nextlist = new InstrList();
+	}
 	
 	void generate_code();
 
@@ -411,7 +455,9 @@ class if_stmt: public stmtAst
 public:
 	expAst *exp;
 	stmtAst *stmt1, *stmt2;
-	if_stmt(){}
+	if_stmt(){
+		nextlist = new InstrList();
+	}
 
 	void generate_code();
 	
@@ -432,7 +478,9 @@ class while_stmt: public stmtAst
 public:
 	expAst *exp;
 	stmtAst *stmt;
-	while_stmt(){}
+	while_stmt(){
+		nextlist = new InstrList();
+	}
 
 	void generate_code();
 
@@ -450,7 +498,9 @@ class for_stmt: public stmtAst
 public:
 	expAst *exp1, *exp2, *exp3;
 	stmtAst *stmt;
-	for_stmt(){}
+	for_stmt(){
+		nextlist = new InstrList();
+	}
 	
 	void generate_code();
 

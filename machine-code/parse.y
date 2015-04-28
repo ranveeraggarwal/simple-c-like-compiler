@@ -40,6 +40,9 @@ program
     : translation_unit
     {
         gst->print();
+        for (auto ins: instructions){
+            ins->print();
+        }
     }
     ;
 
@@ -49,12 +52,16 @@ translation_unit
 		$$ = $1;
 		$$->print();
         cout<<endl;
+        initializeStack();
+        $$->generate_code();
 	}
 	| translation_unit function_definition 
     {
         $$ = $2;
         $$->print();
         cout<<endl;
+        //initializeStack();
+        $$->generate_code();
     }
     ;
 
@@ -91,19 +98,24 @@ fun_declarator
         currentLst->returnType = type;
         gst->lstList.push_back(currentLst);
         offset = 0;
+        paramDone = false;
         scope = 2;
     } 
     parameter_list ')' 
     {
         scope = 1;
+        paramDone = true;
+        offset = -4;
     }
     | IDENTIFIER '('  ')'
     {
         currentLst = new LocalSymbolTable($1);
         currentLst->returnType = type;
         gst->lstList.push_back(currentLst);
-        offset = 0;
+        offset = -4;
         scope = 1;
+        paramDone = true;
+
     } 
 	;
 
@@ -147,7 +159,8 @@ declarator
         $$->type = type;
         $$->size = type->size;
         $$->offset = offset;
-        offset += $$->size;
+        if (!paramDone) offset += $$->size;
+        else offset -= $$->size;
     
     }
     
@@ -158,7 +171,8 @@ declarator
         $$->type = temp;
         offset -= $$->size;
         $$->size *=  temp->size;
-        offset += $$->size;
+        if (!paramDone)offset += $$->size;
+        else offset -= $$->size;
     }
     ;
 
@@ -182,14 +196,17 @@ compound_statement
 	: '{' '}' 
 		{
 			$$ = new block_ast();
+            ((block_ast*)$$)->lst = currentLst;
 		}
 	| '{' statement_list '}' 
 		{
 			$$ = $2;
+            ((block_ast*)$$)->lst = currentLst;
 		}
     | '{' declaration_list statement_list '}' 
     	{
     		$$ = $3;
+            ((block_ast*)$$)->lst = currentLst;
     	}
 	;
 
@@ -278,6 +295,8 @@ assignment_statement
 	} 								
 	|  l_expression '=' expression ';'
 	{
+
+        cerr<<" here first"<<endl;
         Type* tempType = compatibility_check($1->type, $3->type);
         if (tempType == 0){
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
@@ -519,6 +538,7 @@ multiplicative_expression
     }
 	| multiplicative_expression '*' unary_expression 
 	{
+        cerr<<"here later"<<endl;
         Type* tempType = arithmetic_check($1->type, $3->type);
         if(tempType==0){
             cout<<"Incompatible expressions"<<" at line number "<<lineCount<<endl;
