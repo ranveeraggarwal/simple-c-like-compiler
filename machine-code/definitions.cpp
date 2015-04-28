@@ -962,3 +962,10 @@ void fun_call::generate_code(){
 		}
 	}
 }
+
+void fun_call_stmt::generate_code(){
+	fun_call* temp = new fun_call();
+	temp->fun_name = fun_name;
+	temp->expList = expList;
+	temp->generate_code();
+}

@@ -230,9 +230,7 @@ public:
 	exp_list* expList;
 	fun_call_stmt(){}
 
-	void generate_code(){
-		
-	}
+	void generate_code();
 	
 	void print()
 	{
