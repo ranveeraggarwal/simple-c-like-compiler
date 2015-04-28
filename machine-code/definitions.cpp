@@ -831,3 +831,13 @@ void ass::generate_code(){
 /*
 For ranveer: generate code for float constant, int constant and try for funcall
 */
+
+void float_constant::generate_code(){
+	Register* top = registers.top();
+	instructions.push_back(new Instruction("loadf", to_string(value), top->name));
+}
+
+void int_constant::generate_code(){
+	Register* top = registers.top();
+	instructions.push_back(new Instruction("loadi", to_string(value), top->name));
+}

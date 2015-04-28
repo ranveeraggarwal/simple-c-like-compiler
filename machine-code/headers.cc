@@ -135,10 +135,7 @@ public:
 	int value;
 	int_constant(){}
 
-	void generate_code(){
-
-	}
-
+	void generate_code();
 	void print();
 	
 };
@@ -254,9 +251,7 @@ public:
 	float value;
 	float_constant(){}
 	
-	void generate_code(){
-		
-	}
+	void generate_code();
 
 	void print()
 	{
