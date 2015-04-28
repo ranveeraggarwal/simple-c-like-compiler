@@ -511,25 +511,25 @@ void op :: generate_code()
 					}
 
 					else if (opcode == "-"){
-						exp2val *= -1;
-						instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
-						instructions.push_back(new Instruction("addi", to_string(exp2val), top->name));
+						val2 = "-" + val2;
+						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("add" + instrType, val2, top->name));
 					}
 
 					else if (opcode == "*"){
-						instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
-						instructions.push_back(new Instruction("muli", to_string(exp2val), top->name));
+						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("mul" + instrType, val2, top->name));
 					}
 
 					else if (opcode == "/"){
-						instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
-						instructions.push_back(new Instruction("divi", to_string(exp2val), top->name));
+						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("div" + instrType, val2, top->name));
 					}
 
 					else if (opcode == "<" || opcode == ">" || opcode == "<=" 
 						|| opcode == ">=" || opcode == "==" || opcode == "!="){
-						instructions.push_back(new Instruction("movei", to_string(exp1val), top->name));
-						instructions.push_back(new Instruction("compi", to_string(exp2val), top->name));
+						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("comp" + instrType, val2, top->name));
 
 						if (fallthrough){
 							Instruction* code = new Instruction(fallthroughinstr(opcode));
@@ -555,32 +555,34 @@ void op :: generate_code()
 						nonconstant_exp = exp1;
 					}
 					nonconstant_exp->generate_code();
-					int val = ((int_constant*)constant_exp)->value;
+					string val;
+					if(instrType == "i") val = to_string(((int_constant*)constant_exp)->value);
+					else val = to_string(((float_constant*)constant_exp)->value);
 					Register* top = registers.top();
 					string regName = top->name;
 					if (opcode == "+"){
-						instructions.push_back(new Instruction("addi", to_string(val), regName));
+						instructions.push_back(new Instruction("add" + instrType, val, regName));
 					}
 					else if (opcode == "*"){
-						instructions.push_back(new Instruction("muli", to_string(val), regName));
+						instructions.push_back(new Instruction("mul" + instrType, val, regName));
 					}
 					else if (opcode == "-"){
-						instructions.push_back(new Instruction("muli", to_string(-1), regName));
-						instructions.push_back(new Instruction("addi", to_string(val), regName));
+						instructions.push_back(new Instruction("mul" + instrType, "-1", regName));
+						instructions.push_back(new Instruction("add" + instrType, val, regName));
 
 						if (constant_exp == exp2){
-							instructions.push_back(new Instruction("muli", to_string(-1), regName));
+							instructions.push_back(new Instruction("mul" + instrType, "-1", regName));
 						}
 					}
 					else if (opcode == "/"){
 						if (constant_exp == exp1){
-							instructions.push_back(new Instruction("divi", to_string(val), regName));
+							instructions.push_back(new Instruction("div" + instrType, val, regName));
 						}
 						else {
 							registers.pop();
 							Register* top2 = registers.top();
-							instructions.push_back(new Instruction("movei", to_string(val), top2->name));
-							instructions.push_back(new Instruction("divi", regName, top2->name));
+							instructions.push_back(new Instruction("move" + instrType, val, top2->name));
+							instructions.push_back(new Instruction("div" + instrType, regName, top2->name));
 							registers.pop();
 							registers.push(top);
 							registers.push(top2);
@@ -593,15 +595,15 @@ void op :: generate_code()
 						Register* top2 = registers.top();
 
 
-						instructions.push_back(new Instruction("movei", to_string(val), regName));
+						instructions.push_back(new Instruction("move" + instrType, val, regName));
 						if (constant_exp == exp1){
-							instructions.push_back(new Instruction("compi", regName, top2->name));
+							instructions.push_back(new Instruction("comp" + instrType, regName, top2->name));
 							registers.pop();
 							registers.push(top);
 							registers.push(top2);
 						}
 						else {
-							instructions.push_back(new Instruction("compi", top2->name, regName));
+							instructions.push_back(new Instruction("comp" + instrType, top2->name, regName));
 							registers.push(top);
 						}
 
@@ -622,7 +624,7 @@ void op :: generate_code()
 					exp1->generate_code();
 					Register* top = registers.top();
 
-					instructions.push_back(new Instruction("pushi", top->name, ""));
+					instructions.push_back(new Instruction("push" + instrType, top->name, ""));
 
 					exp2->generate_code();
 					top = registers.top();
@@ -631,27 +633,27 @@ void op :: generate_code()
 					Register* top2 = registers.top();
 					string reg1Name = top2->name;
 
-					instructions.push_back(new Instruction("loadi", "ind(esp)", reg1Name));
+					instructions.push_back(new Instruction("load" + instrType, "ind(esp)", reg1Name));
 
 					if (opcode == "+"){
-						instructions.push_back(new Instruction("addi", reg1Name, reg2Name));
+						instructions.push_back(new Instruction("add" + instrType, reg1Name, reg2Name));
 					}
 					else if (opcode == "-"){
-						instructions.push_back(new Instruction("addi", reg2Name, reg1Name));
-						instructions.push_back(new Instruction("movei", "-1", reg2Name));
-						instructions.push_back(new Instruction("muli", reg1Name, reg2Name));
+						instructions.push_back(new Instruction("add" + instrType, reg2Name, reg1Name));
+						instructions.push_back(new Instruction("move" + instrType, "-1", reg2Name));
+						instructions.push_back(new Instruction("mul" + instrType, reg1Name, reg2Name));
 					}
 					else if (opcode == "*"){
-						instructions.push_back(new Instruction("muli", reg1Name, reg2Name));
+						instructions.push_back(new Instruction("mul" + instrType, reg1Name, reg2Name));
 					}
 					else if (opcode == "/"){
-						instructions.push_back(new Instruction("divi", reg1Name, reg2Name));
+						instructions.push_back(new Instruction("div" + instrType, reg1Name, reg2Name));
 					}
 
 					else if (opcode == "<" || opcode == ">" || opcode == "<=" 
 						|| opcode == ">=" || opcode == "==" || opcode == "!="){
 
-						instructions.push_back(new Instruction("cmpi", reg1Name, reg2Name));
+						instructions.push_back(new Instruction("cmp" + instrType, reg1Name, reg2Name));
 			
 						if (fallthrough){
 							Instruction* code = new Instruction(fallthroughinstr(opcode));
