@@ -402,7 +402,7 @@ void op :: generate_code()
 						int offset = id->var->offset;
 						Register* top = registers.top();
 
-						instructions.push_back(new Instruction("move" + instrType, arg1, top->name));
+						instructions.push_back(new Instruction("move", arg1, top->name));
 						instructions.push_back(new Instruction("store" + instrType, top->name, "ind(ebp+"+to_string(offset)+")"));
 
 					}
@@ -413,7 +413,7 @@ void op :: generate_code()
 						
 						string topName = top->name;
 						instructions.push_back(new Instruction("store" + instrType, arg1, "ind("+topName+")"));
-						instructions.push_back(new Instruction("move" + instrType , arg1, topName));
+						instructions.push_back(new Instruction("move" , arg1, topName));
 					}
 				}
 				else {
@@ -506,29 +506,29 @@ void op :: generate_code()
 
 					Register* top = registers.top();
 					if (opcode == "+"){
-						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("move", val1, top->name));
 						instructions.push_back(new Instruction("add" + instrType, val2, top->name));
 					}
 
 					else if (opcode == "-"){
 						val2 = "-" + val2;
-						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("move", val1, top->name));
 						instructions.push_back(new Instruction("add" + instrType, val2, top->name));
 					}
 
 					else if (opcode == "*"){
-						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("move", val1, top->name));
 						instructions.push_back(new Instruction("mul" + instrType, val2, top->name));
 					}
 
 					else if (opcode == "/"){
-						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("move" , val1, top->name));
 						instructions.push_back(new Instruction("div" + instrType, val2, top->name));
 					}
 
 					else if (opcode == "<" || opcode == ">" || opcode == "<=" 
 						|| opcode == ">=" || opcode == "==" || opcode == "!="){
-						instructions.push_back(new Instruction("move" + instrType, val1, top->name));
+						instructions.push_back(new Instruction("move", val1, top->name));
 						instructions.push_back(new Instruction("comp" + instrType, val2, top->name));
 
 						if (fallthrough){
@@ -581,7 +581,7 @@ void op :: generate_code()
 						else {
 							registers.pop();
 							Register* top2 = registers.top();
-							instructions.push_back(new Instruction("move" + instrType, val, top2->name));
+							instructions.push_back(new Instruction("move", val, top2->name));
 							instructions.push_back(new Instruction("div" + instrType, regName, top2->name));
 							registers.pop();
 							registers.push(top);
@@ -595,7 +595,7 @@ void op :: generate_code()
 						Register* top2 = registers.top();
 
 
-						instructions.push_back(new Instruction("move" + instrType, val, regName));
+						instructions.push_back(new Instruction("move", val, regName));
 						if (constant_exp == exp1){
 							instructions.push_back(new Instruction("comp" + instrType, regName, top2->name));
 							registers.pop();
@@ -640,7 +640,7 @@ void op :: generate_code()
 					}
 					else if (opcode == "-"){
 						instructions.push_back(new Instruction("add" + instrType, reg2Name, reg1Name));
-						instructions.push_back(new Instruction("move" + instrType, "-1", reg2Name));
+						instructions.push_back(new Instruction("move", "-1", reg2Name));
 						instructions.push_back(new Instruction("mul" + instrType, reg1Name, reg2Name));
 					}
 					else if (opcode == "*"){
@@ -672,9 +672,307 @@ void op :: generate_code()
 				}
 
 			} // HERE ends op for integer
+			//Doing for INT OP FLOAT and FLOAT OP INT
 			else {
-				//TODO :: for float with proper casting 
-			}
+				bool isExp1Int;
+				if (exp1->type->base == 1) isExp1Int = 1;
+				else isExp1Int = 0;
+
+				bool isExp1Const = false;
+
+				bool isExp2Const = false;
+
+				int_constant* intC;
+				float_constant* floatC;
+				if (isExp1Int){
+					if (intC = dynamic_cast<int_constant*>(exp1)){
+						isExp1Const = true;
+					}
+					if (floatC = dynamic_cast<float_constant*>(exp2)){
+						isExp2Const = true;
+					}
+				}
+				else {
+					if (intC = dynamic_cast<int_constant*>(exp2)){
+						isExp2Const = true;
+					}
+					if (floatC = dynamic_cast<float_constant*>(exp1)){
+						isExp1Const = true;
+					}
+				}
+
+				if (isExp1Const && isExp2Const){
+					string val1, val2;
+					if (isExp1Int){
+						val1 = to_string(intC->value);
+						val2 = to_string(floatC->value);
+					}
+					else {
+						val1 = to_string(floatC->value);
+						val2 = to_string(intC->value);
+					}
+
+					Register* top = registers.top();
+					registers.pop();
+					Register* top2 = registers.top();
+					if (opcode == "+"){
+						instructions.push_back(new Instruction("move", val1, top->name));
+						if (isExp1Int) {
+							instructions.push_back(new Instruction("intTofloat", top->name));
+							instructions.push_back(new Instruction("addf", val2, top->name));
+						}
+						else {
+							instructions.push_back(new Instruction("move", val2, top2->name));
+							instructions.push_back(new Instruction("intTofloat", top2->name));
+							instructions.push_back(new Instruction("addf", top2->name, top->name));
+						}
+					}
+
+					else if (opcode == "-"){
+						val2 = "-" + val2;
+						instructions.push_back(new Instruction("move", val1, top->name));
+						if (isExp1Int) {
+							instructions.push_back(new Instruction("intTofloat", top->name));
+							instructions.push_back(new Instruction("addf", val2, top->name));
+						}
+						else {
+							instructions.push_back(new Instruction("move", val2, top2->name));
+							instructions.push_back(new Instruction("intTofloat", top2->name));
+							instructions.push_back(new Instruction("addf", top2->name, top->name));
+						}
+					}
+
+					else if (opcode == "*"){
+						instructions.push_back(new Instruction("move", val1, top->name));
+						if (isExp1Int) {
+							instructions.push_back(new Instruction("intTofloat", top->name));
+							instructions.push_back(new Instruction("addf", val2, top->name));
+						}
+						else {
+							instructions.push_back(new Instruction("move", val2, top2->name));
+							instructions.push_back(new Instruction("intTofloat", top2->name));
+							instructions.push_back(new Instruction("addf", top2->name, top->name));
+						}
+					}
+
+					else if (opcode == "/"){
+						instructions.push_back(new Instruction("move", val1, top->name));
+						if (isExp1Int) {
+							instructions.push_back(new Instruction("intTofloat", top->name));
+							instructions.push_back(new Instruction("addf", val2, top->name));
+						}
+						else {
+							instructions.push_back(new Instruction("move", val2, top2->name));
+							instructions.push_back(new Instruction("intTofloat", top2->name));
+							instructions.push_back(new Instruction("addf", top2->name, top->name));
+						}
+					}
+
+					else if (opcode == "<" || opcode == ">" || opcode == "<=" 
+						|| opcode == ">=" || opcode == "==" || opcode == "!="){
+						instructions.push_back(new Instruction("move", val1, top->name));
+						if (isExp1Int){
+							instructions.push_back(new Instruction("intTofloat", top->name));
+							instructions.push_back(new Instruction("compf", val2, top->name));
+						}
+						else {
+							instructions.push_back(new Instruction("move", val2, top2->name));
+							instructions.push_back(new Instruction("intTofloat", top2->name));
+							instructions.push_back(new Instruction("compf", top2->name, top->name));
+						}
+
+						if (fallthrough){
+							Instruction* code = new Instruction(fallthroughinstr(opcode));
+							instructions.push_back(code);
+							falselist->instrList.push_back(code);
+						}
+						else{
+							Instruction* code = new Instruction(notfallthroughinstr(opcode));
+							instructions.push_back(code);
+							truelist->instrList.push_back(code);
+						}
+					}
+					registers.push(top);
+				}
+				else if (isExp2Const || isExp1Const){
+					expAst* constant_exp;
+					expAst* nonconstant_exp;
+
+					bool isConstExpInt;
+					if (isExp1Const){
+						if (isExp1Int) isConstExpInt = true;
+						else isConstExpInt = false;
+						constant_exp = exp1;
+						nonconstant_exp = exp2;
+					}
+					else {
+						if (isExp1Int) isConstExpInt = false;
+						else isConstExpInt = true;
+						constant_exp = exp2;
+						nonconstant_exp = exp1;
+					}
+					nonconstant_exp->generate_code();
+					string val;
+					if(isConstExpInt) val = to_string(((int_constant*)constant_exp)->value);
+					else val = to_string(((float_constant*)constant_exp)->value);
+					Register* top = registers.top();
+					string regName = top->name;
+
+					if (!isConstExpInt){
+						instructions.push_back(new Instruction("intTofloat", regName));
+					}
+
+					if (opcode == "+"){
+						if (isConstExpInt){
+							registers.pop();
+							Register* top2 = registers.top();
+							instructions.push_back(new Instruction("move", val, top2->name));
+							instructions.push_back(new Instruction("intTofloat", top2->name));
+							instructions.push_back(new Instruction("addf", top2->name, regName));
+							registers.push(top);
+						}
+						else instructions.push_back(new Instruction("addf", val, regName));
+					}
+					else if (opcode == "*"){
+						if (isConstExpInt){
+							registers.pop();
+							Register* top2 = registers.top();
+							instructions.push_back(new Instruction("move", val, top2->name));
+							instructions.push_back(new Instruction("intTofloat", top2->name));
+							instructions.push_back(new Instruction("mulf", top2->name, regName));
+							registers.push(top);
+						}
+						else instructions.push_back(new Instruction("mulf", val, regName));
+					}
+					else if (opcode == "-"){
+						instructions.push_back(new Instruction("mulf", "-1", regName));
+						if (isConstExpInt){
+							registers.pop();
+							Register* top2 = registers.top();
+							instructions.push_back(new Instruction("move", val, top2->name));
+							instructions.push_back(new Instruction("intTofloat", top2->name));
+							instructions.push_back(new Instruction("addf", top2->name, regName));
+							registers.push(top);
+						}
+						else instructions.push_back(new Instruction("addf", val, regName));
+
+						if (constant_exp == exp2){
+							instructions.push_back(new Instruction("mulf", "-1", regName));
+						}
+					}
+					else if (opcode == "/"){
+						if (constant_exp == exp1){
+							if (isConstExpInt){
+								registers.pop();
+								Register* top2 = registers.top();
+								instructions.push_back(new Instruction("move", val, top2->name));
+								instructions.push_back(new Instruction("intTofloat", top2->name));
+								instructions.push_back(new Instruction("divf", top2->name, regName));
+								registers.push(top);
+							}
+							else instructions.push_back(new Instruction("divf", val, regName));
+						}
+						else {
+							registers.pop();
+							Register* top2 = registers.top();
+							instructions.push_back(new Instruction("move", val, top2->name));
+							if (isConstExpInt) instructions.push_back(new Instruction("intTofloat", top2->name));
+							instructions.push_back(new Instruction("divf", regName, top2->name));
+							registers.pop();
+							registers.push(top);
+							registers.push(top2);
+						}
+					}
+					else if (opcode == "<" || opcode == ">" || opcode == "<=" 
+						|| opcode == ">=" || opcode == "==" || opcode == "!="){
+
+						registers.pop();
+						Register* top2 = registers.top();
+
+
+						instructions.push_back(new Instruction("move", val, regName));
+						if (isConstExpInt) instructions.push_back(new Instruction("intTofloat", regName));
+						if (constant_exp == exp1){
+							instructions.push_back(new Instruction("compf", regName, top2->name));
+							registers.pop();
+							registers.push(top);
+							registers.push(top2);
+						}
+						else {
+							instructions.push_back(new Instruction("compf", top2->name, regName));
+							registers.push(top);
+						}
+
+						if (fallthrough){
+							Instruction* code = new Instruction(fallthroughinstr(opcode));
+							instructions.push_back(code);
+							falselist->instrList.push_back(code);
+						}
+						else{
+							Instruction* code = new Instruction(notfallthroughinstr(opcode));
+							instructions.push_back(code);
+							truelist->instrList.push_back(code);
+						}
+					}
+
+				}
+				else { // Both expressions are not constant
+					exp1->generate_code();
+					Register* top = registers.top();
+
+					if (isExp1Int) {
+						instructions.push_back(new Instruction("intTofloat", top->name));
+					}
+					instructions.push_back(new Instruction("pushf", top->name));
+
+					exp2->generate_code();
+					top = registers.top();
+					string reg2Name = top->name;
+					if (!isExp1Int) instructions.push_back(new Instruction("intTofloat", reg2Name));
+					registers.pop();
+					Register* top2 = registers.top();
+					string reg1Name = top2->name;
+
+					instructions.push_back(new Instruction("loadf", "ind(esp)", reg1Name));
+
+					if (opcode == "+"){
+						instructions.push_back(new Instruction("addf", reg1Name, reg2Name));
+					}
+					else if (opcode == "-"){
+						instructions.push_back(new Instruction("addf", reg2Name, reg1Name));
+						instructions.push_back(new Instruction("move", "-1", reg2Name));
+						instructions.push_back(new Instruction("mulf", reg1Name, reg2Name));
+					}
+					else if (opcode == "*"){
+						instructions.push_back(new Instruction("mulf", reg1Name, reg2Name));
+					}
+					else if (opcode == "/"){
+						instructions.push_back(new Instruction("divf", reg1Name, reg2Name));
+					}
+
+					else if (opcode == "<" || opcode == ">" || opcode == "<=" 
+						|| opcode == ">=" || opcode == "==" || opcode == "!="){
+
+						instructions.push_back(new Instruction("cmpf", reg1Name, reg2Name));
+			
+						if (fallthrough){
+							Instruction* code = new Instruction(fallthroughinstr(opcode));
+							instructions.push_back(code);
+							falselist->instrList.push_back(code);
+						}
+						else{
+							Instruction* code = new Instruction(notfallthroughinstr(opcode));
+							instructions.push_back(code);
+							truelist->instrList.push_back(code);
+						}
+					}
+					
+					registers.push(top);
+
+				}
+
+			} // HERE ends op for int op float
+			
 		}
 		
 	}
