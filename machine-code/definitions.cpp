@@ -841,3 +841,124 @@ void int_constant::generate_code(){
 	Register* top = registers.top();
 	instructions.push_back(new Instruction("loadi", to_string(value), top->name));
 }
+
+void fun_call::generate_code(){
+	if (fun_name == "printf"){
+		instructions.push_back(new Instruction("pushi", "0"));
+		for (auto exp: expList->v){
+			if (int_constant* temp = dynamic_cast<int_constant*>(exp)){
+				instructions.push_back(new Instruction("print_int", to_string(temp->value)));
+			}
+			else if (float_constant* temp = dynamic_cast<float_constant*>(exp)){
+				instructions.push_back(new Instruction("print_float", to_string(temp->value)));
+			}
+			else if (string_constant* temp = dynamic_cast<string_constant*>(exp)){
+				instructions.push_back(new Instruction("print_string", temp->value));
+			}
+			else{
+				exp->generate_code();
+				Register* top = registers.top();
+				Type* t = exp->type;
+				if (t->base == 1){
+					instructions.push_back(new Instruction("print_int", top->name));
+
+				}
+				else {
+					instructions.push_back(new Instruction("print_float", top->name));
+				}
+			}
+		}
+		Register* top = registers.top();
+		instructions.push_back(new Instruction("loadi", "ind(esp)", top->name));
+		instructions.push_back(new Instruction("popi", "1"));
+	}
+	else {
+		LocalSymbolTable* lst = gst->getLst(fun_name);
+		Type* returnType = lst->returnType;
+		if (returnType->base == 1){
+			instructions.push_back(new Instruction("pushi", "0"));
+		}
+		else if (returnType->base == 2){
+			instructions.push_back(new Instruction("pushf", "0"));
+		}
+
+		for (int i=0; i< expList->v.size(); i++){
+			Type* t = expList->v[i]->type;
+			Type* t2 = lst->params[i]->type;
+			if (t->base == 1){
+				if (t2->base == 1){
+					if (int_constant* temp = dynamic_cast<int_constant*>(expList->v[i])){
+						instructions.push_back(new Instruction("pushi", to_string(temp->value)));
+					}
+					else {
+						expList->v[i]->generate_code();
+						Register* top = registers.top();
+						instructions.push_back(new Instruction("pushi", top->name));
+					}
+				}
+				else {
+					if (int_constant* temp = dynamic_cast<int_constant*>(expList->v[i])){
+						Register* top = registers.top();
+						instructions.push_back(new Instruction("loadi", to_string(temp->value), top->name));
+						instructions.push_back(new Instruction("intTofloat", top->name));
+						instructions.push_back(new Instruction("pushi", top->name));
+					}
+					else {
+						expList->v[i]->generate_code();
+						Register* top = registers.top();
+						instructions.push_back(new Instruction("intTofloat", top->name));
+						instructions.push_back(new Instruction("pushi", top->name));
+					}
+				}
+			}
+			else {
+				if (t2->base == 2){
+					if (float_constant* temp = dynamic_cast<float_constant*>(expList->v[i])){
+						instructions.push_back(new Instruction("pushf", to_string(temp->value)));
+					}
+					else {
+						expList->v[i]->generate_code();
+						Register* top = registers.top();
+						instructions.push_back(new Instruction("pushf", top->name));
+					}
+				}
+				else {
+					if (float_constant* temp = dynamic_cast<float_constant*>(expList->v[i])){
+						Register* top = registers.top();
+						instructions.push_back(new Instruction("loadf", to_string(temp->value), top->name));
+						instructions.push_back(new Instruction("floatToint", top->name));
+						instructions.push_back(new Instruction("pushf", top->name));
+					}
+					else {
+						expList->v[i]->generate_code();
+						Register* top = registers.top();
+						instructions.push_back(new Instruction("floatToint", top->name));
+						instructions.push_back(new Instruction("pushf", top->name));
+					}
+				}
+			}
+		}
+
+		instructions.push_back(new Instruction(fun_name, ""));
+
+		for (auto var: lst->params){
+			if (var->type->base == 1){
+				instructions.push_back(new Instruction("popi", "1"));
+			}
+			else {
+				instructions.push_back(new Instruction("popf", "1"));
+			}
+		}
+
+		Register* top = registers.top();
+
+		if (returnType->base == 1){
+			instructions.push_back(new Instruction("loadi", "ind(esp)", top->name));
+			instructions.push_back(new Instruction("popi", "1"));
+		}
+		else {
+			instructions.push_back(new Instruction("loadf", "ind(esp)", top->name));
+			instructions.push_back(new Instruction("popf", "1"));
+		}
+	}
+}

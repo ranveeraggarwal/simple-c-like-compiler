@@ -167,12 +167,14 @@ constant_expression
     {
         ($$) = new int_constant();
         ((int_constant*)$$)->value = $1;
+        ((int_constant*)$$)->type = new Type(1);
 
     }
     | FLOAT_CONSTANT 
     {
         ($$) = new float_constant();
         ((float_constant*)$$)->value = $1;
+        ((float_constant*)$$)->type = new Type(2);
     }
     ;
 
