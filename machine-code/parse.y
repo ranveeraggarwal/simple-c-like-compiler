@@ -247,6 +247,7 @@ statement
         }
         tempOffset += $2->type->size;
         ((return_stmt*)$$)->offset = tempOffset;
+        ((return_stmt*)$$)->lst = currentLst;
 		
 	}
     | IDENTIFIER '(' 

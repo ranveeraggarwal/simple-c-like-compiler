@@ -278,6 +278,7 @@ public:
 	}
 };
 
+/*
 class identifier_exp: public expAst
 {
 public:
@@ -298,6 +299,7 @@ public:
 		cout << "\")";
 	}
 };
+*/
 
 class identifier: public arrayRef
 {
@@ -342,6 +344,7 @@ public:
 	}
 };
 
+/*
 class seq: public stmtAst
 {
 public:
@@ -358,6 +361,7 @@ public:
 		stmt2->print();
 	}
 };
+*/
 
 class ass: public stmtAst
 {
@@ -389,6 +393,7 @@ class return_stmt: public stmtAst
 public:
 	expAst *exp;
 	int offset;
+	LocalSymbolTable* lst;
 	return_stmt(){}
 	
 	void generate_code();
